@@ -1,0 +1,10 @@
+[package]
+name = "parsidate" 
+version = "0.1.0"
+edition = "2021"
+description = "A Rust library for converting between Gregorian and Persian (Jalali) dates" 
+license = "MIT" 
+authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
+
+[dependencies]
+chrono = "0.4"
