@@ -5,6 +5,11 @@ edition = "2021"
 description = "A Rust library for converting between Gregorian and Persian (Jalali) dates" 
 license = "MIT" 
 authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
+homepage = "https://sinajalalvandi.ir"
+repository = "https://github.com/jalalvandi/ParsiDate"
+readme = "README.md"
+keywords = ["date", "time","calendar","persian","persiandate","jalali","shamsi","farsidate"]
+categories = ["date-and-time", "localization"]
 
 [dependencies]
 chrono = "0.4"
