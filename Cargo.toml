@@ -8,8 +8,8 @@ authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"]
 homepage = "https://sinajalalvandi.ir"
 repository = "https://github.com/jalalvandi/ParsiDate"
 readme = "README.md"
-keywords = ["date", "time","calendar","persian","persiandate"]
-categories = ["date-and-time", "localization"]
+keywords = ["date", "jalali","calendar","persian","persiandate"]
+categories = ["date-and-time", "localization","internationalization"]
 
 [dependencies]
 chrono = "0.4"
