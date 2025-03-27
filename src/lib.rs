@@ -145,13 +145,13 @@ impl ParsiDate {
     }
 
     /// Checks if a Persian year is a leap year (simplified algorithm).
-    fn is_persian_leap_year(year: i32) -> bool {
+    pub fn is_persian_leap_year(year: i32) -> bool {
         let cycle = year % 33;
         matches!(cycle, 1 | 5 | 9 | 13 | 17 | 21 | 25 | 30)
     }
 
     /// Checks if a Gregorian year is a leap year.
-    fn is_gregorian_leap_year(year: i32) -> bool {
+    pub fn is_gregorian_leap_year(year: i32) -> bool {
         year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
     }
 
