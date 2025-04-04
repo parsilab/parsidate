@@ -1402,7 +1402,6 @@ mod tests {
         }; // Apr 30, 2025 approx?
            // 1404/01/01 -> Mar 21, 2025
            // 1404/02/10 -> Day 31 (Far) + 10 (Ord) = 41 days after Nowruz -> Mar 21 + 40 days = Apr 30, 2025
-           // Days: Jan (31-5=26) + Feb (28) + Mar (31) + Apr (30) = 26+28+31+30 = 116
         let g5 = date5.to_gregorian().unwrap(); // 2025-01-05
         let g6 = date6.to_gregorian().unwrap(); // 2025-04-30
         let expected_days = (g6 - g5).num_days(); // 115 days

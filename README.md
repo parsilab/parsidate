@@ -2,7 +2,6 @@
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
 [![docs.rs](https://docs.rs/parsidate/badge.svg)](https://docs.rs/parsidate)
-<!-- [![Build Status](https://your-ci-provider/badge.svg)](https://your-ci-provider/link) -->
 
 (Scroll down for Persian / برای توضیحات فارسی به پایین صفحه مراجعه کنید)
 
@@ -32,7 +31,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-parsidate = "1.2.0" # Replace with the latest version
+parsidate = "1.2.1" # Replace with the latest version
 chrono = "0.4"     # ParsiDate depends on chrono
 ```
 
@@ -159,7 +158,7 @@ This project is licensed under the [MIT License](LICENSE-MIT).
 
 ```toml
 [dependencies]
-parsidate = "1.2.0" # با آخرین نسخه جایگزین کنید
+parsidate = "1.2.1" # با آخرین نسخه جایگزین کنید
 chrono = "0.4"     # ParsiDate به chrono وابسته است
 ```
 
