@@ -162,74 +162,127 @@ impl ParsiDate {
     /// let nowruz_persian = ParsiDate::from_gregorian(nowruz_gregorian).unwrap();
     /// assert_eq!(nowruz_persian, ParsiDate { year: 1403, month: 1, day: 1 });
     /// ```
+
     pub fn from_gregorian(date: NaiveDate) -> Result<Self, DateError> {
-        let base_date = NaiveDate::from_ymd_opt(621, 3, 21).unwrap(); // نقطه شروع تقویم شمسی
+        // Define the Gregorian base date used as the reference point (epoch) for calculations.
+        // This corresponds roughly to the start of the Persian calendar count (Year 0 or 1).
+        // March 21, 621 AD is used here.
+        // Panic here is acceptable as 621-03-21 is a fixed, valid date.
+        let base_date = NaiveDate::from_ymd_opt(621, 3, 21).unwrap();
+
+        // Calculate the total number of days elapsed between the input Gregorian date and the base date.
         let days_since_base = (date - base_date).num_days();
 
+        // Check if the input date is before the established base date.
+        // This algorithm does not support dates prior to March 21, 621 AD.
         if days_since_base < 0 {
-            return Err(DateError::InvalidDate); // تاریخ‌های قبل از 621-03-21 پشتیبانی نمی‌شن
+            // Return an error indicating an invalid/unsupported date range.
+            return Err(DateError::InvalidDate);
         }
 
-        let mut jy = 0;
+        // Initialize the Persian year counter. Starts assuming year 0 relative to the base date.
+        // `jy` will eventually hold the target Persian year number.
+        let mut jy = 0; // Represents the number of full Persian years passed since the base epoch.
+
+        // Initialize a mutable variable with the total days since the base date.
+        // This variable will be reduced as we account for full years and months.
+        // Cast to i32 for calculations involving subtraction.
         let mut remaining_days = days_since_base as i32;
 
-        // محاسبه سال
+        // --- Determine the Persian Year (jy) ---
+        // Loop while the number of remaining days is sufficient to constitute at least one full Persian year.
+        // This loop iteratively subtracts the days of each Persian year (starting from year 0)
+        // until `remaining_days` holds the number of days *into* the target Persian year `jy`.
         while remaining_days
             >= (if Self::is_persian_leap_year(jy) {
-                366
+                // Check if the current year `jy` is leap
+                366 // Days in a leap year
             } else {
-                365
+                365 // Days in a common year
             })
         {
+            // Calculate the number of days in the current Persian year `jy`.
             let year_days = if Self::is_persian_leap_year(jy) {
                 366
             } else {
                 365
             };
+            // Subtract the days of this full year from the remaining days.
             remaining_days -= year_days;
+            // Increment the Persian year counter, moving to the next year.
             jy += 1;
         }
+        // At this point, `jy` holds the correct Persian year, and `remaining_days` holds
+        // the 0-indexed day number within that year (e.g., 0 for Farvardin 1st, 31 for Ordibehesht 1st).
 
-        // محاسبه ماه و روز
+        // --- Determine the Persian Month (jm) and Day (jd) ---
+        // Check if the determined Persian year `jy` is a leap year to know Esfand's length.
         let is_persian_leap = Self::is_persian_leap_year(jy);
-        let month_lengths = [
-            31,
-            31,
-            31,
-            31,
-            31,
-            31,
-            30,
-            30,
-            30,
-            30,
-            30,
-            if is_persian_leap { 30 } else { 29 },
-        ];
-        let mut jm = 0;
-        let mut jd = 0;
 
+        // Define the lengths of the months for the determined Persian year `jy`.
+        // The last month (Esfand) has 30 days if it's a leap year, 29 otherwise.
+        let month_lengths = [
+            31,                                    // Farvardin
+            31,                                    // Ordibehesht
+            31,                                    // Khordad
+            31,                                    // Tir
+            31,                                    // Mordad
+            31,                                    // Shahrivar
+            30,                                    // Mehr
+            30,                                    // Aban
+            30,                                    // Azar
+            30,                                    // Dey
+            30,                                    // Bahman
+            if is_persian_leap { 30 } else { 29 }, // Esfand (length depends on leap status)
+        ];
+
+        // Initialize Persian month and day variables.
+        let mut jm = 0; // Target Persian month (1-12)
+        let mut jd = 0; // Target Persian day (1-31)
+
+        // Iterate through the months of the year `jy`.
+        // `i` is the 0-indexed month number (0=Farvardin, 1=Ordibehesht, ..., 11=Esfand).
+        // `length` is the number of days in that month.
         for (i, &length) in month_lengths.iter().enumerate() {
+            // Check if the `remaining_days` (0-indexed day within the year) falls into the current month.
             if remaining_days < length {
-                jm = i as u32 + 1;
-                jd = remaining_days + 1;
+                // If yes, we've found the month and day.
+                jm = i as u32 + 1; // Convert 0-indexed `i` to 1-indexed month number.
+                jd = remaining_days + 1; // Convert 0-indexed `remaining_days` to 1-indexed day number.
+                                         // Exit the loop as the correct month and day have been found.
                 break;
             }
+            // If the day is not in this month, subtract the length of this month
+            // and continue to check the next month.
             remaining_days -= length;
         }
 
+        // --- Final Validation and Result ---
+        // If the loop completed without finding a month (jm is still 0), it implies an error
+        // in the calculation (e.g., `days_since_base` was inconsistent or led to an impossible state).
         if jm == 0 {
-            return Err(DateError::InvalidDate); // نباید اتفاق بیفته، ولی چک می‌کنیم
+            // This should theoretically not happen if `days_since_base` was correctly calculated
+            // and the year/month loops worked as expected.
+            return Err(DateError::InvalidDate);
         }
 
+        // Construct the `ParsiDate` result using the calculated year, month, and day.
+        // Cast the day `jd` (i32) back to u32 for the struct field.
         let result = ParsiDate {
             year: jy,
             month: jm,
             day: jd as u32,
         };
+
+        // Perform a final validation check on the constructed date using the `is_valid` method.
+        // This acts as a safeguard against potential edge-case errors in the algorithm
+        // (e.g., if the calculations somehow resulted in day 30 for Esfand in a non-leap year).
         if !result.is_valid() {
+            // If the generated date is somehow invalid by Persian calendar rules, return an error.
             return Err(DateError::InvalidDate);
         }
+
+        // Return the successfully converted and validated Persian date.
         Ok(result)
     }
     /// Converts this Persian (Jalali) date to its equivalent Gregorian date (`chrono::NaiveDate`).
@@ -483,8 +536,8 @@ impl ParsiDate {
     /// assert!(!ParsiDate::is_persian_leap_year(1400)); // 1400 % 33 = 6 -> Not Leap
     /// assert!(!ParsiDate::is_persian_leap_year(1401)); // 1401 % 33 = 7 -> Not Leap
     /// assert!(!ParsiDate::is_persian_leap_year(1402)); // 1402 % 33 = 8 -> Not Leap
-    /// assert!(ParsiDate::is_persian_leap_year(1407)); // 1407 % 33 = 13 -> Leap
-    /// assert!(ParsiDate::is_persian_leap_year(1423)); // 1423 % 33 = 30 -> Leap
+    /// assert!(ParsiDate::is_persian_leap_year(1408)); // 1408 % 33 = 12 -> Leap
+    /// assert!(ParsiDate::is_persian_leap_year(1424)); // 1423 % 33 = 28 -> Leap
     /// ```
     pub fn is_persian_leap_year(year: i32) -> bool {
         // Ensure year is positive, though the cycle works for negative years mathematically.
@@ -499,7 +552,7 @@ impl ParsiDate {
 
         // Check if the cycle position matches one of the designated leap year positions in the 33-year pattern.
         // The pattern is {1, 5, 9, 13, 17, 21, 25, 30}.
-        matches!(cycle_position, 1 | 5 | 9 | 13 | 17 | 21 | 25 | 30)
+        matches!(cycle_position, 1 | 5 | 9 | 13 | 17 | 22 | 26 | 30)
     }
 
     /// Determines if a given Gregorian year is a leap year.
@@ -1072,7 +1125,7 @@ mod tests {
 
     #[test]
     /// Tests the Persian leap year calculation for known leap years.
-    /*  fn test_is_persian_leap_year_true() {
+    fn test_is_persian_leap_year_true() {
         assert!(
             ParsiDate::is_persian_leap_year(1399),
             "Year 1399 should be leap (cycle pos 5)"
@@ -1081,7 +1134,10 @@ mod tests {
             ParsiDate::is_persian_leap_year(1403),
             "Year 1403 should be leap (cycle pos 9)"
         );
-        //TODO: add 1408
+        assert!(
+            ParsiDate::is_persian_leap_year(1408),
+            "Year 1408 should be leap (cycle pos 14)"
+        );
         assert!(
             ParsiDate::is_persian_leap_year(1412),
             "Year 1412 should be leap (cycle pos 18)"
@@ -1102,7 +1158,7 @@ mod tests {
             ParsiDate::is_persian_leap_year(1428),
             "Year 1428 should be leap (cycle pos 1)"
         ); // Next cycle start
-    } */
+    }
 
     #[test]
     /// Tests the Persian leap year calculation for known non-leap years.
