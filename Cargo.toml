@@ -10,7 +10,7 @@ homepage = "https://sinajalalvandi.ir"
 repository = "https://github.com/jalalvandi/ParsiDate"
 readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
-license-file = "LICENSE.md"
+license-file = "LICENSE"
 keywords = ["date", "jalali","calendar","persian","persiandate"]
 categories = ["date-and-time", "localization","internationalization"]
 [badges]
