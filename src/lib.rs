@@ -1,7 +1,5 @@
-// lib.rs (نسخه کامل و اصلاح شده نهایی)
-
 //  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-//  * Version : 1.3.2 (Corrected Tests & Parser)
+//  * Version : 1.3.2
 //  * f3dcebad-2908-4694-b835-a1ff6b337f35 - Extended & Corrected
 //! # ParsiDate: Comprehensive Persian (Jalali) Calendar Implementation in Rust
 //!
