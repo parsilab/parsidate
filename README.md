@@ -124,7 +124,7 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 
 ### License
 
-This project is licensed under the [MIT License](LICENSE-MIT).
+This project is open-source under the Apache-2.0  License ([License](LICENSE)).
 
 ---
 
@@ -252,4 +252,4 @@ cargo test
 
 ### مجوز انتشار
 
-این پروژه تحت مجوز [MIT](LICENSE-MIT) منتشر شده است.
+این پروژه تحت مجوز [Apache-2.0](LICENSE) منتشر شده است.
