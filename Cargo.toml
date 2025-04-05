@@ -1,9 +1,9 @@
 [package]
 name = "parsidate" 
-version = "0.1.2"
+version = "1.3.2"
 edition = "2021"
-description = "A Rust library for converting between Gregorian and Persian (Jalali) dates" 
-license = "MIT" 
+description = "provides comprehensive Full functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust." 
+license = "Apache-2.0" 
 authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
 homepage = "https://sinajalalvandi.ir"
 repository = "https://github.com/jalalvandi/ParsiDate"
