@@ -1,7 +1,8 @@
 # ParsiDate: Comprehensive Persian Calendar for Rust
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
-[![docs.rs](https://docs.rs/parsidate/badge.svg)](https://docs.rs/parsidate)
+![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.3.3)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 
 
@@ -27,14 +28,14 @@ Add `parsidate` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-parsidate = "1.3.2"
+parsidate = "1.3.3"
 ```
 
 If you need serialization/deserialization support, enable the `serde` feature:
 
 ```toml
 [dependencies]
-parsidate = { version = "1.3.2", features = ["serde"] }
+parsidate = { version = "1.3.3", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] } # Required for derive
 ```
 
@@ -217,4 +218,8 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 
 ### 📄 License
 
-Licensed under either of [Apache License, Version 2.0](LICENSE).
+Licensed under either of [Apache License, Version 2.0](./LICENSE).
+
+```
+128558ad-c066-4c4a-9b93-bca896bf4465
+```
