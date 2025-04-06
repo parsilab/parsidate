@@ -1,12 +1,15 @@
-//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-//  * Version : 1.3.3
-//  * 128558ad-c066-4c4a-9b93-bca896bf4465
 //  * src/date.rs
+//
+//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Version : 1.4.0
+//  * eb1f0cae-a178-41e5-b109-47f208e77913
 //
 //! Contains the `ParsiDate` struct definition and its implementation.
 
 // Use necessary items from other modules and external crates
-use crate::constants::{MAX_PARSI_DATE, MIN_PARSI_DATE, MONTH_NAMES_PERSIAN, WEEKDAY_NAMES_PERSIAN};
+use crate::constants::{
+    MAX_PARSI_DATE, MIN_PARSI_DATE, MONTH_NAMES_PERSIAN, WEEKDAY_NAMES_PERSIAN,
+};
 use crate::error::{DateError, ParseErrorKind};
 use chrono::{Datelike, Days, NaiveDate, Timelike}; // Added Days for arithmetic
 use std::fmt;
@@ -25,11 +28,11 @@ use std::str::FromStr; // For potential future direct FromStr impl
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ParsiDate {
     /// The year component of the Persian date (e.g., 1403). Must be between 1 and 9999 inclusive.
-   pub(crate) year: i32,
+    pub(crate) year: i32,
     /// The month component of the Persian date (1 = Farvardin, ..., 12 = Esfand). Must be between 1 and 12 inclusive.
-   pub(crate) month: u32,
+    pub(crate) month: u32,
     /// The day component of the Persian date (1-29/30/31). Must be valid for the given month and year.
-   pub(crate) day: u32,
+    pub(crate) day: u32,
 }
 
 // --- Core Implementation ---
@@ -250,10 +253,10 @@ impl ParsiDate {
             // If Farvardin 1st of the guess is *after* the target date, the guess is too high.
             if gy_start_of_pyear > gregorian_date {
                 p_year_guess -= 1; // Adjust guess down
-                                   // If the adjusted guess is now the correct year, break.
-                                   // We need to re-check the start date for the new guess if we continue looping,
-                                   // but if `gy_start_of_pyear` was only slightly too high, `p_year_guess - 1` is likely correct.
-                                   // Re-evaluating in the next loop iteration is safer. Let's refine this.
+                // If the adjusted guess is now the correct year, break.
+                // We need to re-check the start date for the new guess if we continue looping,
+                // but if `gy_start_of_pyear` was only slightly too high, `p_year_guess - 1` is likely correct.
+                // Re-evaluating in the next loop iteration is safer. Let's refine this.
 
                 // Let's test the *new* guess immediately.
                 let temp_prev_start_date = unsafe { ParsiDate::new_unchecked(p_year_guess, 1, 1) };
@@ -406,7 +409,7 @@ impl ParsiDate {
     /// Returns `Err(DateError::GregorianConversionError)` if chrono fails to create the epoch date,
     /// if integer overflow occurs during day summation, or if adding the final day offset
     /// to the Gregorian epoch date fails (e.g., results in a date out of chrono's range).
-    fn to_gregorian_internal(&self) -> Result<NaiveDate, DateError> {
+    pub(crate) fn to_gregorian_internal(&self) -> Result<NaiveDate, DateError> {
         // Gregorian start date corresponding to Persian epoch (1/1/1).
         let persian_epoch_gregorian_start =
             NaiveDate::from_ymd_opt(622, 3, 21).ok_or(DateError::GregorianConversionError)?;
@@ -1109,9 +1112,11 @@ impl ParsiDate {
                 ParsiDate::new(y, m, d).map_err(|e| {
                     // Distinguish between InvalidDate from ParsiDate::new and other internal errors.
                     match e {
-                         DateError::InvalidDate => DateError::ParseError(ParseErrorKind::InvalidDateValue),
-                         // Propagate other potential errors from new, though unlikely here.
-                         other_err => other_err,
+                        DateError::InvalidDate => {
+                            DateError::ParseError(ParseErrorKind::InvalidDateValue)
+                        }
+                        // Propagate other potential errors from new, though unlikely here.
+                        other_err => other_err,
                     }
                 })
             }
@@ -1152,7 +1157,7 @@ impl ParsiDate {
 
     /// Internal helper for weekday calculation, returns Result.
     /// Assumes self might be invalid, performs check.
-    fn weekday_internal(&self) -> Result<String, DateError> {
+    pub(crate) fn weekday_internal(&self) -> Result<String, DateError> {
         // Ensure the date is valid before proceeding.
         if !self.is_valid() {
             return Err(DateError::InvalidDate);
@@ -1175,7 +1180,7 @@ impl ParsiDate {
     ///
     /// Returns `Err(DateError::InvalidDate)` if `self` is invalid.
     /// Returns `Err(DateError::GregorianConversionError)` if `to_gregorian_internal` fails.
-    fn weekday_num_sat_0(&self) -> Result<u32, DateError> {
+    pub(crate) fn weekday_num_sat_0(&self) -> Result<u32, DateError> {
         // Ensure the date is valid.
         if !self.is_valid() {
             return Err(DateError::InvalidDate);
@@ -1226,7 +1231,7 @@ impl ParsiDate {
 
     /// Internal helper for ordinal calculation, returns Result.
     /// Assumes self might be invalid, performs check.
-    fn ordinal_internal(&self) -> Result<u32, DateError> {
+    pub(crate) fn ordinal_internal(&self) -> Result<u32, DateError> {
         // Ensure the date is valid before calculating.
         if !self.is_valid() {
             return Err(DateError::InvalidDate);

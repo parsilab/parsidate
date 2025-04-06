@@ -1,7 +1,8 @@
-//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-//  * Version : 1.3.3
-//  * 128558ad-c066-4c4a-9b93-bca896bf4465
 //  * src/error.rs
+//
+//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Version : 1.4.0
+//  * eb1f0cae-a178-41e5-b109-47f208e77913
 //
 //! Defines the error types used within the parsidate library.
 
@@ -32,6 +33,9 @@ pub enum DateError {
     /// Indicates an invalid ordinal day number was provided (e.g., to `from_ordinal`).
     /// The ordinal day must be between 1 and 365 (for common years) or 1 and 366 (for leap years).
     InvalidOrdinal,
+    /// Indicates that a given hour, minute, or second does not form a valid time
+    /// (e.g., hour 24, minute 60).
+    InvalidTime,
 }
 
 /// Specific kinds of parsing errors encountered by `ParsiDate::parse`.
@@ -54,6 +58,9 @@ pub enum ParseErrorKind {
     InvalidMonthName,
     /// Reserved for future use if weekday parsing (`%A`) is implemented. Currently unused.
     InvalidWeekdayName,
+    /// A time component (hour using `%H`, minute using `%M`, second using `%S`)
+    /// was parsed successfully but forms an invalid time logically (e.g., "25:00:00").
+    InvalidTimeValue,
 }
 
 // --- Error Implementation ---
@@ -63,7 +70,7 @@ impl fmt::Display for DateError {
         match self {
             DateError::InvalidDate => write!(
                 f,
-                "Invalid Persian date components (year [1-9999], month [1-12], or day)"
+                "Invalid Persian date components (year [1-9999], month [1-12], or day [1-29.30.31])"
             ),
             DateError::GregorianConversionError => write!(
                 f,
@@ -76,8 +83,9 @@ impl fmt::Display for DateError {
             ),
             DateError::InvalidOrdinal => write!(
                 f,
-                "Invalid ordinal day number (must be 1-365 or 1-366 based on year)"
+                "Invalid ordinal day number (must be 1-365 or 1-366 based on leap year)"
             ),
+            DateError::InvalidTime => write!(f, "Invalid time components (hour [0-23], minute [0-59], or second [0-59])"),
         }
     }
 }
@@ -105,6 +113,7 @@ impl fmt::Display for ParseErrorKind {
                 f,
                 "Could not parse or recognize Persian weekday name (currently unused)"
             ),
+            ParseErrorKind::InvalidTimeValue => write!(f, "Parsed hour, minute, and second form an invalid time"),
         }
     }
 }

@@ -1,7 +1,8 @@
-//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-//  * Version : 1.3.3
-//  * 128558ad-c066-4c4a-9b93-bca896bf4465
 //  * src/constants.rs
+//
+//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Version : 1.4.0
+//  * eb1f0cae-a178-41e5-b109-47f208e77913
 //
 //! Contains constant definitions used throughout the parsidate library.
 
