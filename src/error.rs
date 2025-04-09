@@ -1,8 +1,11 @@
-//  * src/error.rs
+//! ~/src/error.rs
 //
-//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Package : parsidate
+//  * License : Apache-2.0
 //  * Version : 1.4.0
-//  * eb1f0cae-a178-41e5-b109-47f208e77913
+//  * URL     : https://github.com/jalalvandi/parsidate
+//  * Sign    : eb1f0cae-a178-41e5-b109-47f208e77913
 //
 //! Defines the error types used within the parsidate library.
 
@@ -85,7 +88,10 @@ impl fmt::Display for DateError {
                 f,
                 "Invalid ordinal day number (must be 1-365 or 1-366 based on leap year)"
             ),
-            DateError::InvalidTime => write!(f, "Invalid time components (hour [0-23], minute [0-59], or second [0-59])"),
+            DateError::InvalidTime => write!(
+                f,
+                "Invalid time components (hour [0-23], minute [0-59], or second [0-59])"
+            ),
         }
     }
 }
@@ -113,7 +119,9 @@ impl fmt::Display for ParseErrorKind {
                 f,
                 "Could not parse or recognize Persian weekday name (currently unused)"
             ),
-            ParseErrorKind::InvalidTimeValue => write!(f, "Parsed hour, minute, and second form an invalid time"),
+            ParseErrorKind::InvalidTimeValue => {
+                write!(f, "Parsed hour, minute, and second form an invalid time")
+            }
         }
     }
 }

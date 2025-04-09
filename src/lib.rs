@@ -1,8 +1,11 @@
-//  * src/lib.rs
+//! ~/rc/lib.rs
 //
-//  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Package : parsidate
+//  * License : Apache-2.0
 //  * Version : 1.4.0
-//  * eb1f0cae-a178-41e5-b109-47f208e77913 - Add DateTime Support
+//  * URL     : https://github.com/jalalvandi/parsidate
+//  * Sign    : eb1f0cae-a178-41e5-b109-47f208e77913
 //
 //! # ParsiDate: Comprehensive Persian (Jalali) Calendar Implementation in Rust
 
@@ -105,8 +108,8 @@
 // Declare the modules within the src directory
 mod constants;
 mod date;
-mod error;
 mod datetime;
+mod error;
 
 // Conditionally declare the tests module
 #[cfg(test)]
