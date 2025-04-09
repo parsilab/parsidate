@@ -11,12 +11,11 @@ edition = "2024"
 description = "provides comprehensive full functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust." 
 license = "Apache-2.0" 
 authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
-homepage = "https://sinajalalvandi.ir/projects/index/parsidate/"
+homepage = "https://crates.io/crates/parsidate"
 repository = "https://github.com/jalalvandi/ParsiDate"
 readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
-license-file = "LICENSE"
-keywords = ["date", "jalali","calendar","persian","persiandate"]
+keywords = ["date", "jalali","calendar","persian","shamsi"]
 categories = ["date-and-time", "localization","internationalization"]
 
 [badges]
