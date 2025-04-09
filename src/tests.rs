@@ -14,7 +14,7 @@
 mod datetime_tests {
     // Import necessary items, including those from the outer scope if needed
     use crate::{DateError, ParseErrorKind, ParsiDate, ParsiDateTime};
-    use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
+    use chrono::{Duration, NaiveDate};
 
     // Helper function for creating ParsiDateTime, panicking on failure
     fn pdt(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> ParsiDateTime {

@@ -9,10 +9,10 @@
 //
 //! Contains the `ParsiDateTime` struct definition and its implementation for handling
 
-use crate::constants::{MONTH_NAMES_PERSIAN, WEEKDAY_NAMES_PERSIAN}; // Reuse constants
+use crate::constants::MONTH_NAMES_PERSIAN; // Reuse constants
 use crate::date::ParsiDate;
 use crate::error::{DateError, ParseErrorKind};
-use chrono::{Datelike, Duration, Local, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
+use chrono::{Duration, Local, NaiveDateTime, Timelike};
 use std::fmt;
 use std::ops::{Add, Sub};
 
@@ -201,7 +201,7 @@ impl ParsiDateTime {
     ) -> Self {
         ParsiDateTime {
             // Creates the inner ParsiDate unsafely as well, assuming its components are valid
-            date: ParsiDate::new_unchecked(year, month, day),
+            date: unsafe { ParsiDate::new_unchecked(year, month, day) },
             hour,
             minute,
             second,
