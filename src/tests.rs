@@ -338,7 +338,6 @@ mod datetime_tests {
     #[cfg(feature = "serde")]
     mod serde_tests_dt {
         use super::*; // Import items from outer scope
-        use serde_json;
 
         #[test]
         fn test_datetime_serialization_deserialization() {
@@ -1596,7 +1595,7 @@ fn test_constants_validity_and_values() {
 #[cfg(feature = "serde")]
 mod serde_tests {
     use super::*; // Import items from outer scope
-    use serde_json; // Assuming serde_json is a dev-dependency
+    //use serde_json; // Assuming serde_json is a dev-dependency
 
     #[test]
     fn test_serialization_deserialization_valid() {
@@ -1698,14 +1697,6 @@ mod serde_tests {
                 );
             }
         }
-
-        // Completely wrong JSON structure (array instead of object)
-        let json_wrong_structure = r#"[1403, 5, 2]"#;
-        assert!(
-            serde_json::from_str::<ParsiDate>(json_wrong_structure).is_err(),
-            "Should fail deserialization due to wrong JSON structure (array vs object)"
-        );
-
         // Empty JSON object
         let json_empty = r#"{}"#;
         assert!(

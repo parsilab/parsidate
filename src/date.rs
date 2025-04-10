@@ -508,7 +508,7 @@ impl ParsiDate {
     /// *   Adding the final calculated day offset using `chrono::Days` fails, likely because the
     ///     resulting Gregorian date is outside the range supported by `chrono::NaiveDate`.
     // Marked pub(crate) as it's an internal helper assuming validity.
-    pub(crate) fn to_gregorian_internal(&self) -> Result<NaiveDate, DateError> {
+    pub(crate) fn to_gregorian_internal(self) -> Result<NaiveDate, DateError> {
         // Define the Gregorian start date corresponding to the Persian epoch (1/1/1 Parsi).
         let persian_epoch_gregorian_start =
             NaiveDate::from_ymd_opt(622, 3, 21).ok_or(DateError::GregorianConversionError)?;
@@ -864,8 +864,8 @@ impl ParsiDate {
     /// ```
     pub fn days_in_month(year: i32, month: u32) -> u32 {
         match month {
-            1 | 2 | 3 | 4 | 5 | 6 => 31, // First 6 months have 31 days
-            7 | 8 | 9 | 10 | 11 => 30,   // Next 5 months have 30 days
+            1..=6 => 31,  // First 6 months have 31 days
+            7..=11 => 30, // Next 5 months have 30 days
             12 => {
                 // 12th month (Esfand) depends on leap year status
                 if Self::is_persian_leap_year(year) {
@@ -1316,7 +1316,7 @@ impl ParsiDate {
                             // Check if the input string starts with this month name (case-sensitive)
                             if current_s_str.starts_with(month_name) {
                                 // Found a match. Store its details.
-                                best_match_len = month_name.as_bytes().len(); // Get byte length for slicing
+                                best_match_len = month_name.len(); // Get byte length for slicing
                                 matched_month_idx = idx;
                                 found_month = true;
                                 break; // Stop searching after the first match
@@ -1335,9 +1335,12 @@ impl ParsiDate {
                         // `fmt_bytes` was already advanced past '%B'.
                     }
                     // --- Unsupported Specifiers for Parsing ---
-                    b'A' | b'w' | b'j' | _ => {
+                    b'A' | b'w' | b'j' => {
                         // Includes any other byte
                         // Specifiers like weekday, ordinal day are not supported for parsing.
+                        return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));
+                    }
+                    _ => {
                         return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));
                     }
                 }
@@ -1541,10 +1544,10 @@ impl ParsiDate {
         if self.month > 1 {
             // Iterate through the lengths of months from Farvardin up to the one before self.month.
             // Example: If self.month is 3 (Khordad), loop runs for indices 0 (Far) and 1 (Ord).
-            for month_index in 0..(self.month - 1) as usize {
+            for days in month_lengths.iter().take((self.month - 1) as usize) {
                 // Use checked_add for safety against potential u32 overflow (very unlikely here).
                 accumulated_days = accumulated_days
-                    .checked_add(month_lengths[month_index])
+                    .checked_add(*days)
                     .ok_or(DateError::ArithmeticOverflow)?;
             }
         }
@@ -1573,7 +1576,7 @@ impl ParsiDate {
     /// # Arguments
     ///
     /// * `days`: The number of days to add. A positive value moves the date forward,
-    ///           a negative value moves it backward.
+    ///   a negative value moves it backward.
     ///
     /// # Errors
     ///
@@ -1927,7 +1930,7 @@ impl ParsiDate {
             .ok_or(DateError::ArithmeticOverflow)?; // Map Option::None to our error
 
         // 3. Check if the calculated target year falls outside the supported range [1, 9999].
-        if target_year < MIN_PARSI_DATE.year || target_year > MAX_PARSI_DATE.year {
+        if !(MIN_PARSI_DATE.year..=MAX_PARSI_DATE.year).contains(&target_year) {
             return Err(DateError::ArithmeticOverflow); // Year out of bounds
         }
 
@@ -2128,7 +2131,7 @@ impl ParsiDate {
             return Err(DateError::InvalidDate);
         }
         // 2. Validate the target year range immediately.
-        if year < MIN_PARSI_DATE.year || year > MAX_PARSI_DATE.year {
+        if !(MIN_PARSI_DATE.year..=MAX_PARSI_DATE.year).contains(&year) {
             // Map out-of-range year to InvalidDate for consistency.
             return Err(DateError::InvalidDate);
         }
@@ -2205,7 +2208,7 @@ impl ParsiDate {
             return Err(DateError::InvalidDate);
         }
         // 2. Validate the target month range immediately.
-        if month < 1 || month > 12 {
+        if !(1..=12).contains(&month) {
             return Err(DateError::InvalidDate); // Invalid target month number
         }
 
@@ -2305,7 +2308,7 @@ impl ParsiDate {
     /// 1.  It assumes `self` is valid (checked by `debug_assert!`).
     /// 2.  If `self.year` and `self.month` are valid (which is assumed), then day `1` is *always*
     ///     a valid day for that month and year in the Persian calendar.
-    /// A `debug_assert!(self.is_valid())` is included to catch misuse in debug builds.
+    ///     A `debug_assert!(self.is_valid())` is included to catch misuse in debug builds.
     ///
     /// # Examples
     ///
@@ -2348,7 +2351,7 @@ impl ParsiDate {
     /// 2.  [`ParsiDate::days_in_month`] correctly calculates the valid last day number (29, 30, or 31)
     ///     for the assumed-valid `self.year` and `self.month`.
     /// 3.  Constructing a date with this calculated last day for the same year/month is guaranteed to be valid.
-    /// A `debug_assert!(self.is_valid())` is included.
+    ///     A `debug_assert!(self.is_valid())` is included.
     ///
     /// # Examples
     ///
@@ -2400,7 +2403,7 @@ impl ParsiDate {
     /// Uses `unsafe { ParsiDate::new_unchecked }` for performance. This is safe because:
     /// 1.  It assumes `self` is valid (checked by `debug_assert!`), meaning `self.year` is valid [1, 9999].
     /// 2.  Month 1 (Farvardin) and Day 1 are always valid components for any valid year in the Persian calendar.
-    /// A `debug_assert!(self.is_valid())` is included.
+    ///     A `debug_assert!(self.is_valid())` is included.
     ///
     /// # Examples
     ///
@@ -2440,7 +2443,7 @@ impl ParsiDate {
     /// 2.  [`is_persian_leap_year`] correctly determines if the last day is 29 or 30.
     /// 3.  Month 12 (Esfand) and the calculated last day (29 or 30) always form a valid date
     ///     for the given `self.year`.
-    /// A `debug_assert!(self.is_valid())` is included.
+    ///     A `debug_assert!(self.is_valid())` is included.
     ///
     /// # Examples
     ///

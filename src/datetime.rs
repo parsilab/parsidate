@@ -1112,7 +1112,7 @@ impl ParsiDateTime {
                             // Check if the input string starts with the current month name
                             if current_s_str.starts_with(month_name) {
                                 // Found a match
-                                best_match_len = month_name.as_bytes().len(); // Use byte length for slicing s_bytes
+                                best_match_len = month_name.len(); // Use byte length for slicing s_bytes
                                 matched_month_idx = idx; // Store the 0-based index
                                 found_month = true;
                                 break; // Stop searching once a match is found
@@ -1131,8 +1131,11 @@ impl ParsiDateTime {
                     }
 
                     // --- Unsupported Specifiers for Parsing ---
-                    b'A' | b'w' | b'j' | _ => {
+                    b'A' | b'w' | b'j' => {
                         // Any other specifier is not supported for parsing
+                        return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));
+                    }
+                    _ => {
                         return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));
                     }
                 }
