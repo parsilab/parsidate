@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.4.0
+//  * Version : 1.4.1
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign    : eb1f0cae-a178-41e5-b109-47f208e77913
+//  * Sign: parsidate-20250410-f747d2246203-e40c0c12e3ffd6632e4a2ccd1b2b7e7d
 //
 //! # ParsiDate: Comprehensive Persian (Jalali) Calendar Implementation in Rust
 

@@ -1,11 +1,11 @@
 #  * Cargo.toml
 #  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-#  * eb1f0cae-a178-41e5-b109-47f208e77913
+#  * Sign: parsidate-20250410-f747d2246203-e40c0c12e3ffd6632e4a2ccd1b2b7e7d
 
 
 [package]
 name = "parsidate" 
-version = "1.4.0"
+version = "1.4.1"
 edition = "2024"
 description = "A comprehensive library for working with the Persian (Jalali/Shamsi) calendar system in Rust."
 license = "Apache-2.0" 
