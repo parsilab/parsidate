@@ -1,8 +1,23 @@
 # Changelog
 
+## [1.5.0] - 2025-04-12
+
+### Added
+
+*   **Persian Season Support:**
+    *   Introduced a new `Season` enum (`Bahar`, `Tabestan`, `Paeez`, `Zemestan`) representing the four Persian seasons.
+    *   Added `.season() -> Result<Season, DateError>` methods to `ParsiDate` and `ParsiDateTime` to determine the season a given date falls into.
+    *   The `Season` enum provides `name_persian()` and `name_english()` methods to retrieve season names.
+    *   The `Season` enum now implements `fmt::Display` using the Persian name (e.g., `println!("{}", Season::Bahar);` prints "بهار").
+    *   Added `.start_of_season() -> Result<ParsiDate/Time, DateError>` and `.end_of_season() -> Result<ParsiDate/Time, DateError>` methods to `ParsiDate` and `ParsiDateTime` to get the first and last date/datetime of the season containing the instance.
+    *   Added a new format specifier `%K` to `ParsiDate::format()`/`format_strftime()` and `ParsiDateTime::format()` for displaying the full Persian season name (e.g., "تابستان").
+    *   Added comprehensive tests for all season-related functionality.
+
+
 ## [1.4.0]
 
 ### Added
+
  **DateTime support with ParsiDateTime**,
 Key features introduced:
 - **`ParsiDateTime` Struct:** Located in `src/datetime.rs`, stores a `ParsiDate` and H:M:S components.
