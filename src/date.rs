@@ -1,4 +1,4 @@
-//! ~/src/date.rs
+// ~/src/date.rs
 //
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
@@ -449,7 +449,7 @@ impl ParsiDate {
 
     /// Converts this Persian (Jalali) `ParsiDate` to its equivalent Gregorian `chrono::NaiveDate`.
     ///
-    /// This function first validates the `ParsiDate` instance itself using [`is_valid`].
+    /// This function first validates the `ParsiDate` instance itself using `\[`is_valid`\]`.
     /// If valid, it proceeds with the conversion algorithm, which typically involves calculating
     /// the total number of days elapsed since the Persian epoch start (1/1/1) and adding
     /// that count to the corresponding Gregorian start date (622-03-21 CE).
@@ -579,7 +579,7 @@ impl ParsiDate {
     /// Returns `Err(DateError::GregorianConversionError)` if the conversion from the current
     /// system Gregorian date fails. This might occur if the system clock is set to a date
     /// before the Persian epoch (approx. 622 CE) or encounters other issues during the
-    /// conversion process handled by [`from_gregorian`].
+    /// conversion process handled by `\[`from_gregorian`\]`.
     ///
     /// # Examples
     ///
@@ -1659,7 +1659,7 @@ impl ParsiDate {
     ///
     /// # Errors
     ///
-    /// Returns `Err` under the same conditions as [`add_days`].
+    /// Returns `Err` under the same conditions as `\[`add_days`\]`.
     ///
     /// # Examples
     ///
@@ -1779,7 +1779,7 @@ impl ParsiDate {
     /// * `months_to_sub`: The non-negative number of months to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_months`].
+    /// Returns `Err` under the same conditions as `\[`add_months`\]`.
     ///
     /// # Examples
     ///
@@ -1813,7 +1813,7 @@ impl ParsiDate {
     /// * `years_to_add`: The number of years to add. Positive moves forward, negative moves backward.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_months`].
+    /// Returns `Err` under the same conditions as `\[`add_months`\]`.
     ///
     /// # Examples
     ///
@@ -1868,7 +1868,7 @@ impl ParsiDate {
     /// * `years_to_sub`: The non-negative number of years to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_years`].
+    /// Returns `Err` under the same conditions as `\[`add_years`\]`.
     ///
     /// # Examples
     ///
@@ -2299,7 +2299,7 @@ impl ParsiDate {
     ///
     /// Uses `unsafe { ParsiDate::new_unchecked }` for performance. This is safe because:
     /// 1.  It assumes `self` is valid (checked by `debug_assert!`), meaning `self.year` is valid [1, 9999].
-    /// 2.  [`is_persian_leap_year`] correctly determines if the last day is 29 or 30.
+    /// 2.  `\[`is_persian_leap_year`\]` correctly determines if the last day is 29 or 30.
     /// 3.  Month 12 (Esfand) and the calculated last day (29 or 30) always form a valid date
     ///     for the given `self.year`.
     ///     A `debug_assert!(self.is_valid())` is included.

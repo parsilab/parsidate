@@ -1,4 +1,4 @@
-//! ~/src/season.rs
+// ~/src/season.rs
 //
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate

@@ -1,4 +1,4 @@
-//! ~/src/datetime.rs
+// ~/src/datetime.rs
 //
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
@@ -421,14 +421,14 @@ impl ParsiDateTime {
     ///
     /// This function obtains the current local date and time from the operating system
     /// using `chrono::Local::now()`, gets the naive representation (without timezone),
-    /// and then converts this `NaiveDateTime` to `ParsiDateTime` using [`from_gregorian`].
+    /// and then converts this `NaiveDateTime` to `ParsiDateTime` using `\[`from_gregorian`\]`.
     ///
     /// # Errors
     ///
     /// Returns `Err(DateError::GregorianConversionError)` if the conversion from the current
     /// Gregorian date/time provided by the system fails. This could potentially happen if the
     /// system clock is set to a date before the Persian epoch or encounters other issues during
-    /// the conversion process handled by [`from_gregorian`].
+    /// the conversion process handled by `\[`from_gregorian`\]`.
     ///
     /// # Examples
     ///
@@ -1182,7 +1182,7 @@ impl ParsiDateTime {
     /// * `duration`: The `chrono::Duration` to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_duration`].
+    /// Returns `Err` under the same conditions as `\[`add_duration`\]`.
     ///
     /// # Examples
     /// ```rust
@@ -1245,7 +1245,7 @@ impl ParsiDateTime {
     /// * `days`: Non-negative number of days to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_days`].
+    /// Returns `Err` under the same conditions as `\[`add_days`\]`.
     ///
     /// # Examples
     /// ```rust
@@ -1320,7 +1320,7 @@ impl ParsiDateTime {
     /// * `months`: Non-negative number of months to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_months`].
+    /// Returns `Err` under the same conditions as `\[`add_months`\]`.
     ///
     /// # Examples
     /// ```rust
@@ -1395,7 +1395,7 @@ impl ParsiDateTime {
     /// * `years`: Non-negative number of years to subtract.
     ///
     /// # Errors
-    /// Returns `Err` under the same conditions as [`add_years`].
+    /// Returns `Err` under the same conditions as `\[`add_years`\]`.
     ///
     /// # Examples
     ///

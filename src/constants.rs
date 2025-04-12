@@ -1,4 +1,4 @@
-//! ~/src/constants.rs
+// ~/src/constants.rs
 //
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
