@@ -1,11 +1,12 @@
 # ParsiDate: Comprehensive Persian Calendar Date & Time for Rust
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
-![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.5.0) <!-- Consider updating version -->
-![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)
+[![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.5.0)](https://docs.rs/parsidate/latest/parsidate/)
+[![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)](https://crates.io/crates/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)
-![Lint](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml/badge.svg)
+[![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml)
+[![Lint](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml)
+![Maintenance](https://img.shields.io/badge/maintained-actively-green)
 
 
 `parsidate` provides comprehensive functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust. It allows for seamless representation, conversion, validation, formatting, parsing, and arithmetic for both **dates (`ParsiDate`)** and **date-times (`ParsiDateTime`)**. It leverages the `chrono` crate for Gregorian representations, current time, and duration calculations.
