@@ -1705,3 +1705,107 @@ mod serde_tests {
         );
     }
 } // end serde_tests module
+
+#[cfg(test)]
+mod season_tests {
+    use crate::season::Season;
+    use crate::{DateError, ParsiDate, ParsiDateTime};
+
+    // Helper
+    fn pd(y: i32, m: u32, d: u32) -> ParsiDate {
+        ParsiDate::new(y, m, d).unwrap()
+    }
+    fn pdt(y: i32, m: u32, d: u32, h: u32, min: u32, s: u32) -> ParsiDateTime {
+        ParsiDateTime::new(y, m, d, h, min, s).unwrap()
+    }
+
+    #[test]
+    fn test_season_enum_methods() {
+        assert_eq!(Season::Bahar.name_persian(), "بهار");
+        assert_eq!(Season::Tabestan.name_english(), "Summer");
+        assert_eq!(Season::Paeez.start_month(), 7);
+        assert_eq!(Season::Zemestan.end_month(), 12);
+        assert_eq!(format!("{}", Season::Paeez), "پاییز");
+    }
+
+    #[test]
+    fn test_parsidate_season() {
+        // Bahar
+        assert_eq!(pd(1403, 1, 1).season(), Ok(Season::Bahar));
+        assert_eq!(pd(1403, 3, 31).season(), Ok(Season::Bahar));
+        // Tabestan
+        assert_eq!(pd(1403, 4, 1).season(), Ok(Season::Tabestan));
+        assert_eq!(pd(1403, 6, 31).season(), Ok(Season::Tabestan));
+        // Paeez
+        assert_eq!(pd(1403, 7, 1).season(), Ok(Season::Paeez));
+        assert_eq!(pd(1403, 9, 30).season(), Ok(Season::Paeez));
+        // Zemestan
+        assert_eq!(pd(1403, 10, 1).season(), Ok(Season::Zemestan)); // Leap year
+        assert_eq!(pd(1403, 12, 30).season(), Ok(Season::Zemestan));
+        assert_eq!(pd(1404, 10, 1).season(), Ok(Season::Zemestan)); // Common year
+        assert_eq!(pd(1404, 12, 29).season(), Ok(Season::Zemestan));
+
+        // Invalid date
+        let invalid_date = unsafe { ParsiDate::new_unchecked(1403, 13, 1) };
+        assert_eq!(invalid_date.season(), Err(DateError::InvalidDate));
+    }
+
+    #[test]
+    fn test_parsidatetime_season() {
+        assert_eq!(pdt(1403, 2, 10, 12, 0, 0).season(), Ok(Season::Bahar));
+        assert_eq!(pdt(1403, 8, 1, 0, 0, 0).season(), Ok(Season::Paeez));
+
+        let invalid_dt = unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 10, 0, 0) }; // Invalid date part
+        assert_eq!(invalid_dt.season(), Err(DateError::InvalidDate));
+    }
+
+    #[test]
+    fn test_format_season() {
+        let dt_summer = pdt(1403, 5, 2, 8, 5, 30); // Tabestan
+        let dt_winter = pdt(1403, 11, 10, 20, 0, 0); // Zemestan
+
+        assert_eq!(dt_summer.format("%Y %K %m"), "1403 تابستان 05");
+        assert_eq!(dt_winter.format("%K - %d/%m/%Y"), "زمستان - 10/11/1403");
+        assert_eq!(dt_summer.date().format("%K"), "تابستان");
+
+        // Test caching (use %K twice)
+        assert_eq!(dt_summer.format("%K %K"), "تابستان تابستان");
+
+        // Test error indicator
+        let invalid_dt = unsafe { ParsiDateTime::new_unchecked(1403, 13, 1, 10, 0, 0) };
+        assert_eq!(invalid_dt.format("%K"), "?SeasonError?");
+    }
+
+    #[test]
+    fn test_season_boundaries() {
+        let d_spring = pd(1403, 2, 15); // Spring
+        assert_eq!(d_spring.start_of_season(), Ok(pd(1403, 1, 1)));
+        assert_eq!(d_spring.end_of_season(), Ok(pd(1403, 3, 31)));
+
+        let d_autumn = pd(1403, 9, 1); // Autumn
+        assert_eq!(d_autumn.start_of_season(), Ok(pd(1403, 7, 1)));
+        assert_eq!(d_autumn.end_of_season(), Ok(pd(1403, 9, 30)));
+
+        // Winter - Leap Year
+        let d_winter_leap = pd(1403, 10, 5);
+        assert_eq!(d_winter_leap.start_of_season(), Ok(pd(1403, 10, 1)));
+        assert_eq!(d_winter_leap.end_of_season(), Ok(pd(1403, 12, 30)));
+
+        // Winter - Common Year
+        let d_winter_common = pd(1404, 11, 10);
+        assert_eq!(d_winter_common.start_of_season(), Ok(pd(1404, 10, 1)));
+        assert_eq!(d_winter_common.end_of_season(), Ok(pd(1404, 12, 29)));
+
+        // Test ParsiDateTime boundaries
+        let dt_summer = pdt(1403, 4, 1, 12, 0, 0);
+        assert_eq!(dt_summer.start_of_season().unwrap().date(), pd(1403, 4, 1));
+        assert_eq!(dt_summer.start_of_season().unwrap().time(), (12, 0, 0));
+        assert_eq!(dt_summer.end_of_season().unwrap().date(), pd(1403, 6, 31));
+        assert_eq!(dt_summer.end_of_season().unwrap().time(), (12, 0, 0));
+
+        // Test error case
+        let invalid_date = unsafe { ParsiDate::new_unchecked(1403, 13, 1) };
+        assert_eq!(invalid_date.start_of_season(), Err(DateError::InvalidDate));
+        assert_eq!(invalid_date.end_of_season(), Err(DateError::InvalidDate));
+    }
+} // end mod season_tests
