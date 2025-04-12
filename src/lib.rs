@@ -110,7 +110,7 @@ mod constants;
 mod date;
 mod datetime;
 mod error;
-
+mod season;
 // Conditionally declare the tests module
 #[cfg(test)]
 mod tests;

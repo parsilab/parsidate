@@ -66,3 +66,18 @@ pub(crate) const WEEKDAY_NAMES_PERSIAN: [&str; 7] = [
     "پنجشنبه",  // 5
     "جمعه",     // 6
 ];
+
+/// Persian season names (index 0 = Bahar, ..., 3 = Zemestan).
+// Keep internal for now, accessed via Season enum methods.
+pub(crate) const SEASON_NAMES_PERSIAN: [&str; 4] = [
+    "بهار",    // 0: Bahar (Spring)
+    "تابستان", // 1: Tabestan (Summer)
+    "پاییز",   // 2: Paeez (Autumn/Fall)
+    "زمستان",  // 3: Zemestan (Winter)
+];
+
+/// English season names corresponding to Persian seasons.
+pub(crate) const SEASON_NAMES_ENGLISH: [&str; 4] = [
+    "Spring", "Summer", "Autumn", // or "Fall"
+    "Winter",
+];
