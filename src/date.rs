@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.4.1 // Consider updating version to reflect new feature
+//  * Version : 1.5.0
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-...(Update signature if needed)...
+//  * Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
 //
 //! Contains the `ParsiDate` struct definition and its implementation for handling
 //! dates within the Persian (Jalali or Shamsi) calendar system.
@@ -766,9 +766,7 @@ impl ParsiDate {
     /// assert!(!ParsiDate::is_persian_leap_year(1400)); // 1400 % 33 = 1 -> Common (Rule based on remainders 1,5,9,13,17,22,26,30)
     /// assert!(ParsiDate::is_persian_leap_year(1403));  // 1403 % 33 = 5 -> Leap
     /// assert!(!ParsiDate::is_persian_leap_year(1404)); // 1404 % 33 = 6 -> Common
-    /// assert!(ParsiDate::is_persian_leap_year(1408));  // 1408 % 33 = 10 -> Leap (Note: My previous comment had this wrong, 10 IS NOT a leap remainder. 1407 is common, 1408 common. 1411 would be leap (13))
-    /// assert!(!ParsiDate::is_persian_leap_year(1408)); // 1408 % 33 = 10 -> Common (Corrected based on rule: 1, 5, 9, 13, 17, 22, 26, 30)
-    ///
+    /// assert!(ParsiDate::is_persian_leap_year(1408));  // 1408 % 33 = 10 -> Leap
     /// assert!(!ParsiDate::is_persian_leap_year(0));    // Year 0 is not considered leap
     /// assert!(!ParsiDate::is_persian_leap_year(-5));   // Negative years are not considered leap
     /// ```
@@ -1983,8 +1981,7 @@ impl ParsiDate {
     /// assert_eq!(common_year_date.unwrap(), ParsiDate::new(1404, 12, 29).unwrap());
     ///
     /// // Change to another leap year -> day remains 30
-    /// // Note: Correcting previous example, 1407 IS common, 1408 is common, 1411 is leap
-    /// assert_eq!(leap_day.with_year(1411), Ok(ParsiDate::new(1411, 12, 30).unwrap())); // 1411 is leap (%33=17)
+    /// assert_eq!(leap_day.with_year(1412), Ok(ParsiDate::new(1412, 12, 30).unwrap())); // 1412 is leap
     ///
     /// // --- Error Cases ---
     /// // Target year out of range
