@@ -4,6 +4,8 @@
 ![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.5.0) <!-- Consider updating version -->
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)
+![Lint](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml/badge.svg)
 
 
 `parsidate` provides comprehensive functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust. It allows for seamless representation, conversion, validation, formatting, parsing, and arithmetic for both **dates (`ParsiDate`)** and **date-times (`ParsiDateTime`)**. It leverages the `chrono` crate for Gregorian representations, current time, and duration calculations.
