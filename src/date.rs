@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.5.0
+//  * Version : 1.6.0
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
+//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 //
 //! Contains the `ParsiDate` struct definition and its implementation for handling
 //! dates within the Persian (Jalali or Shamsi) calendar system.
@@ -905,6 +905,96 @@ impl ParsiDate {
         ]
     }
 
+    /// Calculates the week number of the year for this date.
+    ///
+    /// The week number is determined based on the following rules:
+    /// *   Weeks start on Saturday (Shanbeh).
+    /// *   Week 1 is the week containing the first day of the year (Farvardin 1st).
+    /// *   Weeks are numbered sequentially starting from 1.
+    ///
+    /// For example, if Farvardin 1st is a Wednesday, then Farvardin 1st, 2nd (Thursday),
+    /// and 3rd (Friday) are all in week 1. Farvardin 4th (Saturday) would be the start of week 2.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(DateError::InvalidDate)` if the `ParsiDate` instance holds invalid data.
+    /// Returns `Err(DateError::GregorianConversionError)` if the required calculation of the
+    /// first day's weekday fails (which involves Gregorian conversion).
+    /// Returns `Err(DateError::ArithmeticOverflow)` if calculating the ordinal day fails.
+    ///
+    /// # Returns
+    ///
+    /// The week number (typically between 1 and 53) within the Persian year.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use parsidate::ParsiDate;
+    ///
+    /// // Farvardin 1st, 1403 was a Wednesday (weekday 4)
+    /// let farvardin_1st = ParsiDate::new(1403, 1, 1).unwrap();
+    /// assert_eq!(farvardin_1st.week_of_year(), Ok(1));
+    ///
+    /// // Farvardin 3rd, 1403 was a Friday (weekday 6) - Still week 1
+    /// let farvardin_3rd = ParsiDate::new(1403, 1, 3).unwrap();
+    /// assert_eq!(farvardin_3rd.week_of_year(), Ok(1));
+    ///
+    /// // Farvardin 4th, 1403 was a Saturday (weekday 0) - Start of week 2
+    /// let farvardin_4th = ParsiDate::new(1403, 1, 4).unwrap();
+    /// assert_eq!(farvardin_4th.week_of_year(), Ok(2));
+    ///
+    /// // A date later in the year
+    /// let mordad_2nd = ParsiDate::new(1403, 5, 2).unwrap(); // Ordinal 126
+    /// // Calculation: first day weekday=4. effective_ordinal = 126 + 4 = 130.
+    /// // week = (130 - 1) / 7 + 1 = 129 / 7 + 1 = 18 + 1 = 19
+    /// assert_eq!(mordad_2nd.week_of_year(), Ok(19));
+    ///
+    /// // Last day of leap year 1403 (Esfand 30th, Thursday, weekday 5, ordinal 366)
+    /// let end_of_1403 = ParsiDate::new(1403, 12, 30).unwrap();
+    /// // Calculation: first day weekday=4. effective_ordinal = 366 + 4 = 370.
+    /// // week = (370 - 1) / 7 + 1 = 369 / 7 + 1 = 52 + 1 = 53
+    /// assert_eq!(end_of_1403.week_of_year(), Ok(53));
+    ///
+    /// // Last day of common year 1404 (Esfand 29th, Friday, weekday 6, ordinal 365)
+    /// // Farvardin 1st, 1404 was a Friday (weekday 6)
+    /// let end_of_1404 = ParsiDate::new(1404, 12, 29).unwrap();
+    /// // Calculation: first day weekday=6. effective_ordinal = 365 + 6 = 371.
+    /// // week = (371 - 1) / 7 + 1 = 370 / 7 + 1 = 52 + 1 = 53
+    /// assert_eq!(end_of_1404.week_of_year(), Ok(53));
+    /// ```
+    pub fn week_of_year(&self) -> Result<u32, DateError> {
+        // 1. Validate the input date first.
+        if !self.is_valid() {
+            return Err(DateError::InvalidDate);
+        }
+
+        // 2. Get the date of the first day of this year.
+        let first_day = self.first_day_of_year(); // This is inherently valid if self is valid.
+
+        // 3. Find the weekday number of the first day (Saturday = 0).
+        //    This involves Gregorian conversion, so it can return an error.
+        let first_day_weekday = first_day.weekday_num_sat_0()?; // Result<u32, DateError>
+
+        // 4. Get the ordinal day number of the current date (1-based).
+        //    This also involves validation and potential errors.
+        let current_ordinal = self.ordinal_internal()?; // Result<u32, DateError>
+
+        // 5. Calculate the "effective" ordinal day relative to the start of the week containing Farvardin 1st.
+        //    Add the weekday number of the first day to the current ordinal day.
+        //    Example: If Far 1st is Wednesday (4), and date is Far 1st (ord 1), effective = 1 + 4 = 5.
+        //             If Far 1st is Wednesday (4), and date is Far 4th (ord 4, Saturday), effective = 4 + 4 = 8.
+        let effective_ordinal = current_ordinal
+            .checked_add(first_day_weekday)
+            .ok_or(DateError::ArithmeticOverflow)?; // Check for potential overflow (highly unlikely)
+
+        // 6. Calculate the week number (1-based).
+        //    Divide the (0-based effective day) by 7 and add 1.
+        //    (effective_ordinal - 1) gives the 0-based day count from the start of week 1.
+        let week_number = (effective_ordinal - 1) / 7 + 1;
+
+        Ok(week_number)
+    }
+
     // --- Formatting ---
 
     /// Formats the `ParsiDate` into a string using predefined styles or a custom pattern.
@@ -917,7 +1007,7 @@ impl ParsiDate {
     ///     *   `"short"`: Formats as "YYYY/MM/DD" (e.g., "1403/05/02"). This is the default style used by the `Display` trait implementation (`.to_string()`).
     ///     *   `"long"`: Formats as "D MonthName YYYY" using the full Persian month name (e.g., "2 مرداد 1403"). Note: The day `D` is *not* zero-padded in this style.
     ///     *   `"iso"`: Formats according to ISO 8601 style for dates: "YYYY-MM-DD" (e.g., "1403-05-02").
-    ///     *   **Custom Pattern**: If the string does not match "short", "long", or "iso", it is treated as a custom format pattern string to be processed by [`format_strftime`](#method.format_strftime). See that method's documentation for supported specifiers like `%Y`, `%m`, `%d`, `%B`, `%A`, `%w`, `%j`, `%K` etc. // <-- Added %K here
+    ///     *   **Custom Pattern**: If the string does not match "short", "long", or "iso", it is treated as a custom format pattern string to be processed by [`format_strftime`](#method.format_strftime). See that method's documentation for supported specifiers like `%Y`, `%m`, `%d`, `%B`, `%A`, `%w`, `%j`, `%K` `%W` etc.
     ///
     /// # Returns
     ///
@@ -980,10 +1070,11 @@ impl ParsiDate {
     /// | `%m`      | Month as a zero-padded number                      | `05`                     |
     /// | `%d`      | Day of the month as a zero-padded number           | `02`                     |
     /// | `%B`      | Full Persian month name                            | `مرداد`                  |
-    /// | `%A`      | Full Persian weekday name (Saturday to Friday)     | `سه‌شنبه`               |
-    /// | `%w`      | Weekday as a number (Saturday=0, ..., Friday=6)   | `3`                      |
-    /// | `%j`      | Day of the year as a zero-padded number (001-366) | `126`                    |
-    /// | `%K`      | Full Persian season name                           | `تابستان`                 | // <-- Added Season
+    /// | `%A`      | Full Persian weekday name (Saturday to Friday)     | `سه‌شنبه`                 |
+    /// | `%w`      | Weekday as a number (Saturday=0, ..., Friday=6)    | `3`                      |
+    /// | `%j`      | Day of the year as a zero-padded number (001-366)  | `126`                    |
+    /// | `%K`      | Full Persian season name                           | `تابستان`                |
+    /// | `%W`      | Week number of the year (Saturday start, 01-53)    | `19`                     |
     /// | `%%`      | A literal percent sign (`%`)                       | `%`                      |
     ///
     /// **Note:** Unrecognized specifiers (e.g., `%x`, `%y`) are treated as literal characters
@@ -998,7 +1089,7 @@ impl ParsiDate {
     /// A `String` containing the date formatted according to the `pattern`.
     /// If the `ParsiDate` instance contains invalid data (e.g., created via `unsafe new_unchecked`),
     /// or if calculations required for specifiers like `%A`, `%w`, `%j`, `%K` fail (due to conversion errors),
-    /// placeholder values like "?InvalidMonth?", "?WeekdayError?", "?SeasonError?", "???" may appear in the output. // <-- Added SeasonError
+    /// placeholder values like "?InvalidMonth?", "?WeekdayError?",?WeekError?, "?SeasonError?", "???" may appear in the output.
     ///
     /// # Examples
     ///
@@ -1012,10 +1103,12 @@ impl ParsiDate {
     /// assert_eq!(date.format_strftime("%Y-%m-%d"), "1403-01-07");
     ///
     /// // Format with names
-    /// assert_eq!(date.format_strftime("%A، %d %B %Y (%K)"), "سه‌شنبه، 07 فروردین 1403 (بهار)"); // <-- Added %K example
+    /// assert_eq!(date.format_strftime("%A، %d %B %Y (%K)"), "سه‌شنبه، 07 فروردین 1403 (بهار)");
     ///
     /// // Format with day/weekday numbers
     /// assert_eq!(date.format_strftime("Year %Y, Day %j (Weekday %w)"), "Year 1403, Day 007 (Weekday 3)"); // Tuesday is 3 (Sat=0)
+    /// // Format with week number
+    /// assert_eq!(date.format_strftime("Year %Y, Week %W"), "Year 1403, Week 02");
     ///
     /// // Including literal percent sign
     /// assert_eq!(date.format_strftime("Discount %d%% off on %m/%d!"), "Discount 07% off on 01/07!");
@@ -1036,7 +1129,8 @@ impl ParsiDate {
         let mut weekday_name_cache: Option<Result<String, DateError>> = None;
         let mut ordinal_day_cache: Option<Result<u32, DateError>> = None;
         let mut weekday_num_cache: Option<Result<u32, DateError>> = None; // Saturday = 0
-        let mut season_cache: Option<Result<Season, DateError>> = None; // <-- Cache for season
+        let mut season_cache: Option<Result<Season, DateError>> = None;
+        let mut week_of_year_cache: Option<Result<u32, DateError>> = None;
 
         // Iterate through the format pattern characters
         while let Some(c) = chars.next() {
@@ -1104,6 +1198,15 @@ impl ParsiDate {
                             Err(_) => result.push_str("?SeasonError?"), // Indicate calculation error
                         }
                     }
+                    Some('W') => {
+                        if week_of_year_cache.is_none() {
+                            week_of_year_cache = Some(self.week_of_year()); // Calculate if not cached
+                        }
+                        match week_of_year_cache.as_ref().unwrap() {
+                            Ok(week_num) => result.push_str(&format!("{:02}", week_num)), // Zero-padded week number
+                            Err(_) => result.push_str("?WeekError?"), // Error indicator
+                        }
+                    }
                     // Unrecognized Specifier (e.g., %x)
                     Some(other) => {
                         result.push('%');
@@ -1147,7 +1250,7 @@ impl ParsiDate {
     /// *   `%%`: Matches a literal percent sign (`%`) character in the input string.
     ///
     /// **Unsupported Specifiers:** Specifiers representing calculated values like `%A` (weekday name),
-    /// `%w` (weekday number), `%j` (ordinal day), and `%K` (season name) are *not* supported for parsing. Using them // <-- Mentioned %K here
+    /// `%w` (weekday number), `%j` (ordinal day), and `%K` (season name), and `%W` (week number) are *not* supported for parsing. Using them
     /// in the `format` string will result in a `ParseErrorKind::UnsupportedSpecifier` error.
     ///
     /// # Arguments
@@ -1297,8 +1400,7 @@ impl ParsiDate {
                         // `fmt_bytes` was already advanced past '%B'.
                     }
                     // --- Unsupported Specifiers for Parsing ---
-                    b'A' | b'w' | b'j' | b'K' => {
-                        // <-- Added %K here
+                    b'A' | b'w' | b'j' | b'K' | b'W' => {
                         // Includes any other byte
                         // Specifiers like weekday, ordinal day, season are not supported for parsing.
                         return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));

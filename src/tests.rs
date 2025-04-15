@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.5.0
+//  * Version : 1.6.0
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
+//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 //
 //! Unit tests for the parsidate library.
 
@@ -145,6 +145,53 @@ mod datetime_tests {
             }
             Err(e) => panic!("ParsiDateTime::now() failed: {}", e),
         }
+    }
+
+    #[test]
+    fn test_week_of_year() {
+        // --- Year 1403 (Leap Year, starts on Wednesday - weekday 4) ---
+        // First day is week 1
+        assert_eq!(pd(1403, 1, 1).week_of_year(), Ok(1)); // Wed
+        assert_eq!(pd(1403, 1, 2).week_of_year(), Ok(1)); // Thu
+        assert_eq!(pd(1403, 1, 3).week_of_year(), Ok(1)); // Fri
+        // Start of week 2
+        assert_eq!(pd(1403, 1, 4).week_of_year(), Ok(2)); // Sat
+        assert_eq!(pd(1403, 1, 10).week_of_year(), Ok(2)); // Fri
+        // Start of week 3
+        assert_eq!(pd(1403, 1, 11).week_of_year(), Ok(3)); // Sat
+        // Mid-year
+        assert_eq!(pd(1403, 5, 2).week_of_year(), Ok(19)); // Ordinal 126 -> Effective 130 -> Week 19
+        // End of year
+        assert_eq!(pd(1403, 12, 29).week_of_year(), Ok(53)); // Ordinal 365 -> Effective 369 -> Week 53
+        assert_eq!(pd(1403, 12, 30).week_of_year(), Ok(53)); // Ordinal 366 -> Effective 370 -> Week 53
+
+        // --- Year 1404 (Common Year, starts on Friday - weekday 6) ---
+        // First day is week 1
+        assert_eq!(pd(1404, 1, 1).week_of_year(), Ok(1)); // Fri
+        // Start of week 2
+        assert_eq!(pd(1404, 1, 2).week_of_year(), Ok(2)); // Sat
+        assert_eq!(pd(1404, 1, 8).week_of_year(), Ok(2)); // Fri
+        // Start of week 3
+        assert_eq!(pd(1404, 1, 9).week_of_year(), Ok(3)); // Sat
+        // End of year
+        assert_eq!(pd(1404, 12, 28).week_of_year(), Ok(53)); // Ordinal 364 -> Effective 370 -> Week 53
+        assert_eq!(pd(1404, 12, 29).week_of_year(), Ok(53)); // Ordinal 365 -> Effective 371 -> Week 53
+
+        // --- Year 1 (Common Year, starts on Friday? Check conversion) ---
+        // 1/1/1 Parsi = 622-03-21 Gregorian (Friday) -> weekday 6
+        assert_eq!(pd(1, 1, 1).week_of_year(), Ok(1)); // Fri
+        assert_eq!(pd(1, 1, 2).week_of_year(), Ok(1)); // Sat (Start of Week 1)
+
+        // Test ParsiDateTime delegation
+        let dt = crate::datetime::ParsiDateTime::new(1403, 1, 4, 10, 0, 0).unwrap(); // Week 2
+        assert_eq!(dt.week_of_year(), Ok(2));
+
+        // Test Error Case (invalid date)
+        let invalid_date = unsafe { ParsiDate::new_unchecked(1400, 13, 1) };
+        assert!(matches!(
+            invalid_date.week_of_year(),
+            Err(DateError::InvalidDate)
+        ));
     }
 
     // --- Formatting Tests ---

@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.5.0
+//  * Version : 1.6.0
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
+//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 //
 //! Contains the `ParsiDateTime` struct definition and its implementation for handling
 //! date and time within the Persian (Jalali or Shamsi) calendar system.
@@ -679,6 +679,30 @@ impl ParsiDateTime {
             && self.second <= 59
     }
 
+    /// Calculates the week number of the year for this date-time's date component.
+    ///
+    /// This method delegates the calculation to [`ParsiDate::week_of_year`] using the
+    /// date part of this `ParsiDateTime`. See the documentation of that method for
+    /// the definition of week numbering and potential errors. The time component is ignored.
+    ///
+    /// # Errors
+    /// Returns `Err(DateError::InvalidDate)` or `Err(DateError::GregorianConversionError)`
+    /// or `Err(DateError::ArithmeticOverflow)` if the underlying date calculation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use parsidate::ParsiDateTime;
+    ///
+    /// // Farvardin 4th, 1403, 10:00 AM - Should be week 2
+    /// let dt = ParsiDateTime::new(1403, 1, 4, 10, 0, 0).unwrap();
+    /// assert_eq!(dt.week_of_year(), Ok(2));
+    /// ```
+    #[inline]
+    pub fn week_of_year(&self) -> Result<u32, DateError> {
+        self.date.week_of_year() // Delegate to the ParsiDate method
+    }
+
     // --- Formatting ---
 
     /// Formats the `ParsiDateTime` into a string according to a given format pattern.
@@ -704,7 +728,8 @@ impl ParsiDateTime {
     /// *   `%A`: Full Persian weekday name (e.g., "شنبه", "سه‌شنبه"). Requires date to be valid.
     /// *   `%w`: Weekday as a number (Saturday=0, Sunday=1, ..., Friday=6). Requires date to be valid.
     /// *   `%j`: Day of the year as a zero-padded number (001-365 or 366). Requires date to be valid.
-    /// *   `%K`: Full Persian season name (e.g., "تابستان"). Requires date to be valid. // <-- Added Season
+    /// *   `%K`: Full Persian season name (e.g., "تابستان"). Requires date to be valid.
+    /// *   `%W`: Week number of the year (Saturday start, 01-53). Requires date to be valid.
     /// *   `%%`: A literal percent sign (`%`).
     ///
     /// **Time Specifiers:**
@@ -717,7 +742,7 @@ impl ParsiDateTime {
     /// **Note:** If the `ParsiDateTime` instance contains invalid date or time components
     /// (e.g., created via `new_unchecked`), the output for the corresponding specifiers
     /// might be incorrect, nonsensical, or display error markers like `?InvalidMonth?` or `???`.
-    /// Specifiers requiring calculation (like `%A`, `%w`, `%j`, `%K`) might return error indicators // <-- Added Season
+    /// Specifiers requiring calculation (like `%A`, `%w`, `%j`, `%K`) might return error indicators
     /// if the date part is invalid.
     ///
     /// # Arguments
@@ -740,7 +765,10 @@ impl ParsiDateTime {
     /// assert_eq!(dt.format("%Y-%m-%d %H:%M:%S"), "1403-05-02 08:05:30");
     ///
     /// // Format with Persian names and season
-    /// assert_eq!(dt.format("%d %B (%K) %Y ساعت %H:%M"), "02 مرداد (تابستان) 1403 ساعت 08:05"); // <-- Added %K example
+    /// assert_eq!(dt.format("%d %B (%K) %Y ساعت %H:%M"), "02 مرداد (تابستان) 1403 ساعت 08:05");
+    ///
+    /// // Format with week number
+    /// assert_eq!(dt.format("%Y/Week %W %H:%M"), "1403/Week 19 08:05"); // 1403/05/02 is week 19
     ///
     /// // Using %T for time
     /// assert_eq!(dt.format("%Y-%m-%dT%T"), "1403-05-02T08:05:30");
@@ -766,7 +794,8 @@ impl ParsiDateTime {
         let mut weekday_name_cache: Option<Result<String, DateError>> = None;
         let mut ordinal_day_cache: Option<Result<u32, DateError>> = None;
         let mut weekday_num_cache: Option<Result<u32, DateError>> = None; // Saturday = 0
-        let mut season_cache: Option<Result<Season, DateError>> = None; // <-- Cache for season
+        let mut season_cache: Option<Result<Season, DateError>> = None;
+        let mut week_of_year_cache: Option<Result<u32, DateError>> = None;
 
         while let Some(c) = chars.next() {
             if c == '%' {
@@ -821,7 +850,7 @@ impl ParsiDateTime {
                             Err(_) => result.push_str("???"),
                         }
                     }
-                    // --- Season Specifier --- // <-- NEW
+                    // --- Season Specifier --- //
                     Some('K') => {
                         if season_cache.is_none() {
                             season_cache = Some(self.date.season()); // Calculate using date part
@@ -829,6 +858,17 @@ impl ParsiDateTime {
                         match season_cache.as_ref().unwrap() {
                             Ok(season) => result.push_str(season.name_persian()),
                             Err(_) => result.push_str("?SeasonError?"),
+                        }
+                    }
+                    // --- Week of Year '%W' --- //
+                    Some('W') => {
+                        if week_of_year_cache.is_none() {
+                            // Use self.date for calculation
+                            week_of_year_cache = Some(self.date.week_of_year());
+                        }
+                        match week_of_year_cache.as_ref().unwrap() {
+                            Ok(week_num) => result.push_str(&format!("{:02}", week_num)), // Zero-padded
+                            Err(_) => result.push_str("?WeekError?"),
                         }
                     }
 
@@ -877,7 +917,7 @@ impl ParsiDateTime {
     /// *   `%T`: Parses time in the exact format "HH:MM:SS" (e.g., "15:30:05").
     /// *   `%%`: Matches a literal percent sign (`%`) in the input string.
     ///
-    /// **Unsupported Specifiers:** Specifiers like `%A`, `%w`, `%j`, `%K` are *not* supported for parsing // <-- Added %K here
+    /// **Unsupported Specifiers:** Specifiers like `%A`, `%w`, `%j`, `%K`, `%W` are *not* supported for parsing
     /// as they represent calculated values rather than primary inputs. Using them in the format string
     /// will result in a `ParseErrorKind::UnsupportedSpecifier` error.
     ///
@@ -1082,7 +1122,7 @@ impl ParsiDateTime {
                         s_bytes = &s_bytes[best_match_len..];
                     }
                     // Unsupported for parsing
-                    b'A' | b'w' | b'j' | b'K' => {
+                    b'A' | b'w' | b'j' | b'K' | b'W' => {
                         return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier));
                     }
                     _ => return Err(DateError::ParseError(ParseErrorKind::UnsupportedSpecifier)),
