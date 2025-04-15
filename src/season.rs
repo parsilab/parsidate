@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.5.0
+//  * Version : 1.6.0
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
+//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 //
 //! Defines the Persian seasons.
 
