@@ -609,7 +609,7 @@ impl ParsiDateTime {
         (self.hour, self.minute, self.second)
     }
 
-    // --- Season Accessor --- // <-- NEW METHOD
+    // --- Season Accessor --- //
 
     /// Returns the Persian season this `ParsiDateTime`'s date falls into.
     ///
@@ -1751,7 +1751,7 @@ impl ParsiDateTime {
         })
     }
 
-    // --- Season Boundaries --- // <-- NEW SECTION
+    // --- Season Boundaries --- //
 
     /// Returns the `ParsiDateTime` corresponding to the first day of the season this date falls into,
     /// preserving the original time component.
