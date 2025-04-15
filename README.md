@@ -36,7 +36,7 @@ Add `parsidate` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-parsidate = "1.5.0"
+parsidate = "1.6.0"
 chrono = "0.4"
 ```
 
@@ -44,7 +44,7 @@ If you need serialization/deserialization support, enable the `serde` feature:
 
 ```toml
 [dependencies]
-parsidate = { version = "1.5.0", features = ["serde"] } 
+parsidate = { version = "1.6.0", features = ["serde"] } 
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] } # Required for derive
 ```
@@ -261,7 +261,7 @@ assert_eq!(spring_end_dt.time(), (10, 0, 0)); // Time preserved
 | `%Y`      | Parses a 4-digit year               | Requires exactly 4 digits.                                |
 | `%m`      | Parses a 2-digit month (01-12)      | Requires exactly 2 digits.                                |
 | `%d`      | Parses a 2-digit day (01-31)        | Requires exactly 2 digits.                                |
-| `%B`      | Parses a full Persian month name    | Case-sensitive, matches names like "فروردین", "مرداد".      |
+| `%B`      | Parses a full Persian month name    | Case-sensitive, matches names like "فروردین", "مرداد".    |
 | `%H`      | Parses a 2-digit hour (00-23)       | Requires exactly 2 digits. DateTime only.                 |
 | `%M`      | Parses a 2-digit minute (00-59)     | Requires exactly 2 digits. DateTime only.                 |
 | `%S`      | Parses a 2-digit second (00-59)     | Requires exactly 2 digits. DateTime only.                 |
