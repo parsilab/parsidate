@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.0] - 2025-04-15
+
+### Added
+  *   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
+      *   Added `.week_of_year()-> Result<u32, DateError>` method to `ParsiDate` and `ParsiDateTime` to determine the week of the year for a given date.
+
 ## [1.5.0] - 2025-04-12
 
 ### Added

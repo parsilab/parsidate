@@ -25,7 +25,9 @@
 *   **Date/Time Information:** Get the Persian weekday name (شنبه-جمعه), weekday number (0-6), ordinal day of the year (1-366), Persian season (`Season` enum), and access individual date/time components. 
 *   **Helpers:** Get the first/last day of the month/year/season, or create modified dates/datetimes easily (`with_year`, `with_month`, `with_day`, `with_hour`, `with_minute`, `with_second`, `with_time`). 
 *   **Current Date/Time:** Get the current system date (`ParsiDate::today()`) or date-time (`ParsiDateTime::now()`) as Persian objects.
-*   **Serde Support:** Optional serialization/deserialization for both `ParsiDate` and `ParsiDateTime` (and `Season`) via the `serde` feature flag. 
+*   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
+*   **Season:** Display and work with Persian seasons (Spring, Summer, Autumn, Winter), get the Persian name of a season, determine the season for a given date, and access the start and end dates of each season.
+*   **Serde Support:** Optional serialization/deserialization for `ParsiDate`, `ParsiDateTime`, and `Season` via the `serde` feature flag.
 *   **Range:** Supports Persian years from 1 to 9999.
 
 ### ⚙️ Installation
@@ -241,14 +243,15 @@ assert_eq!(spring_end_dt.time(), (10, 0, 0)); // Time preserved
 | `%m`      | Month as zero-padded number         | `05`                               |               |
 | `%d`      | Day of month as zero-padded number  | `02`                               |               |
 | `%B`      | Full Persian month name             | `مرداد`                            |               |
-| `%A`      | Full Persian weekday name           | `سه‌شنبه`                          |               |
+| `%A`      | Full Persian weekday name           | `سه‌شنبه`                           |               |
 | `%w`      | Weekday as number (Saturday=0)      | `3`                                |               |
 | `%j`      | Day of year as zero-padded number   | `126`                              |               |
-| `%K`      | Full Persian season name            | `تابستان`                           | *New*         |
+| `%K`      | Full Persian season name            | `تابستان`                          |               |
 | `%H`      | Hour (24-hour clock), zero-padded   | `15`                               | DateTime only |
 | `%M`      | Minute, zero-padded                 | `30`                               | DateTime only |
 | `%S`      | Second, zero-padded                 | `45`                               | DateTime only |
 | `%T`      | Equivalent to `%H:%M:%S`            | `15:30:45`                         | DateTime only |
+| `%W`      | Week number of the year             | `19`                               |               |
 | `%%`      | A literal `%` character             | `%`                                |               |
 
 #### Parsing (`ParsiDate::parse`, `ParsiDateTime::parse`)
@@ -293,6 +296,6 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 Licensed under the [Apache License, Version 2.0](./LICENSE).
 
 ```
-Version:1.5.0
-Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
+Version:1.6.0
+Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 ```
