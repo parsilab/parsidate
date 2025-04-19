@@ -9,7 +9,7 @@
 //
 //! Defines the Persian seasons.
 
-use crate::constants::{SEASON_NAMES_ENGLISH, SEASON_NAMES_PERSIAN}; // Assuming you add these constants
+use crate::constants::{SEASON_NAMES_ENGLISH, SEASON_NAMES_PERSIAN};
 use std::fmt;
 
 /// Represents the four seasons in the Persian calendar.
@@ -54,20 +54,20 @@ impl Season {
     /// Returns the starting month number (1-12) of the season.
     pub fn start_month(&self) -> u32 {
         match self {
-            Season::Bahar => 1,
-            Season::Tabestan => 4,
-            Season::Paeez => 7,
-            Season::Zemestan => 10,
+            Season::Bahar => 1,     // Farvardin
+            Season::Tabestan => 4,  // Tir
+            Season::Paeez => 7,     // Mehr
+            Season::Zemestan => 10, // Dey
         }
     }
 
     /// Returns the ending month number (1-12) of the season.
     pub fn end_month(&self) -> u32 {
         match self {
-            Season::Bahar => 3,
-            Season::Tabestan => 6,
-            Season::Paeez => 9,
-            Season::Zemestan => 12,
+            Season::Bahar => 3,     // Khordad
+            Season::Tabestan => 6,  // Shahrivar
+            Season::Paeez => 9,     // Azar
+            Season::Zemestan => 12, // Esfand
         }
     }
 }

@@ -1122,13 +1122,13 @@ fn test_weekday() {
 
 #[test]
 fn test_ordinal() {
-    assert_eq!(pd(1403, 1, 1).ordinal(), Ok(1));
+    assert_eq!(pd(1403, 1, 1).ordinal(), Ok(1)); // First day of year
     assert_eq!(pd(1403, 1, 31).ordinal(), Ok(31));
     assert_eq!(pd(1403, 2, 1).ordinal(), Ok(32)); // 31 (Far) + 1
     assert_eq!(pd(1403, 5, 2).ordinal(), Ok(126)); // 4*31 (Far-Tir) + 2 = 124 + 2 = 126
     assert_eq!(pd(1403, 7, 1).ordinal(), Ok(187)); // 6*31 (Far-Sha) + 1 = 186 + 1 = 187
     assert_eq!(pd(1403, 12, 30).ordinal(), Ok(366)); // Last day of leap year 1403
-    assert_eq!(pd(1404, 1, 1).ordinal(), Ok(1));
+    assert_eq!(pd(1404, 1, 1).ordinal(), Ok(1)); // First day of common year 1404
     assert_eq!(pd(1404, 12, 29).ordinal(), Ok(365)); // Last day of common year 1404
     // Test on invalid date
     let invalid_date = unsafe { ParsiDate::new_unchecked(1404, 12, 30) };
@@ -1778,19 +1778,19 @@ mod season_tests {
     #[test]
     fn test_parsidate_season() {
         // Bahar
-        assert_eq!(pd(1403, 1, 1).season(), Ok(Season::Bahar));
-        assert_eq!(pd(1403, 3, 31).season(), Ok(Season::Bahar));
+        assert_eq!(pd(1403, 1, 1).season(), Ok(Season::Bahar)); // Farvardin
+        assert_eq!(pd(1403, 3, 31).season(), Ok(Season::Bahar)); // Khordad
         // Tabestan
-        assert_eq!(pd(1403, 4, 1).season(), Ok(Season::Tabestan));
-        assert_eq!(pd(1403, 6, 31).season(), Ok(Season::Tabestan));
+        assert_eq!(pd(1403, 4, 1).season(), Ok(Season::Tabestan)); // Tir
+        assert_eq!(pd(1403, 6, 31).season(), Ok(Season::Tabestan)); // Sharivar
         // Paeez
-        assert_eq!(pd(1403, 7, 1).season(), Ok(Season::Paeez));
-        assert_eq!(pd(1403, 9, 30).season(), Ok(Season::Paeez));
+        assert_eq!(pd(1403, 7, 1).season(), Ok(Season::Paeez)); // Mehr
+        assert_eq!(pd(1403, 9, 30).season(), Ok(Season::Paeez)); // Azar
         // Zemestan
-        assert_eq!(pd(1403, 10, 1).season(), Ok(Season::Zemestan)); // Leap year
-        assert_eq!(pd(1403, 12, 30).season(), Ok(Season::Zemestan));
-        assert_eq!(pd(1404, 10, 1).season(), Ok(Season::Zemestan)); // Common year
-        assert_eq!(pd(1404, 12, 29).season(), Ok(Season::Zemestan));
+        assert_eq!(pd(1403, 10, 1).season(), Ok(Season::Zemestan)); // Dey
+        assert_eq!(pd(1403, 12, 30).season(), Ok(Season::Zemestan)); // Esfand (leap year)
+        assert_eq!(pd(1404, 10, 1).season(), Ok(Season::Zemestan)); // Dey
+        assert_eq!(pd(1404, 12, 29).season(), Ok(Season::Zemestan)); // Esfand (common year)
 
         // Invalid date
         let invalid_date = unsafe { ParsiDate::new_unchecked(1403, 13, 1) };
@@ -1799,8 +1799,8 @@ mod season_tests {
 
     #[test]
     fn test_parsidatetime_season() {
-        assert_eq!(pdt(1403, 2, 10, 12, 0, 0).season(), Ok(Season::Bahar));
-        assert_eq!(pdt(1403, 8, 1, 0, 0, 0).season(), Ok(Season::Paeez));
+        assert_eq!(pdt(1403, 2, 10, 12, 0, 0).season(), Ok(Season::Bahar)); // Ordibehesht
+        assert_eq!(pdt(1403, 8, 1, 0, 0, 0).season(), Ok(Season::Paeez)); // Aban
 
         let invalid_dt = unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 10, 0, 0) }; // Invalid date part
         assert_eq!(invalid_dt.season(), Err(DateError::InvalidDate));
@@ -1834,17 +1834,17 @@ mod season_tests {
         assert_eq!(d_autumn.end_of_season(), Ok(pd(1403, 9, 30)));
 
         // Winter - Leap Year
-        let d_winter_leap = pd(1403, 10, 5);
+        let d_winter_leap = pd(1403, 10, 5); // Winter
         assert_eq!(d_winter_leap.start_of_season(), Ok(pd(1403, 10, 1)));
         assert_eq!(d_winter_leap.end_of_season(), Ok(pd(1403, 12, 30)));
 
         // Winter - Common Year
-        let d_winter_common = pd(1404, 11, 10);
+        let d_winter_common = pd(1404, 11, 10); // Winter
         assert_eq!(d_winter_common.start_of_season(), Ok(pd(1404, 10, 1)));
         assert_eq!(d_winter_common.end_of_season(), Ok(pd(1404, 12, 29)));
 
         // Test ParsiDateTime boundaries
-        let dt_summer = pdt(1403, 4, 1, 12, 0, 0);
+        let dt_summer = pdt(1403, 4, 1, 12, 0, 0); // Summer
         assert_eq!(dt_summer.start_of_season().unwrap().date(), pd(1403, 4, 1));
         assert_eq!(dt_summer.start_of_season().unwrap().time(), (12, 0, 0));
         assert_eq!(dt_summer.end_of_season().unwrap().date(), pd(1403, 6, 31));

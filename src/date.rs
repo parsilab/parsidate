@@ -12,14 +12,11 @@
 
 // Use necessary items from other modules and external crates
 use crate::constants::{
-    MAX_PARSI_DATE,
-    MIN_PARSI_DATE,
-    MONTH_NAMES_PERSIAN,
-    WEEKDAY_NAMES_PERSIAN, // Keep existing imports
+    MAX_PARSI_DATE, MIN_PARSI_DATE, MONTH_NAMES_PERSIAN, WEEKDAY_NAMES_PERSIAN,
 };
 use crate::error::{DateError, ParseErrorKind};
-use crate::season::Season; // <-- Import the new Season enum
-use chrono::{Datelike, NaiveDate}; // Removed unused `Days` import comment for clarity
+use crate::season::Season;
+use chrono::{Datelike, NaiveDate};
 use std::fmt;
 // use std::ops::{Add, Sub}; // For potential future Duration addition
 // use std::str::FromStr; // For potential future direct FromStr impl
@@ -35,7 +32,7 @@ use std::fmt;
 /// *   Formatting the date into various string representations.
 /// *   Parsing strings into `ParsiDate` instances.
 /// *   Date arithmetic (adding/subtracting days, months, years).
-/// *   Querying date properties like weekday, ordinal day, leap year status, season, etc. // <-- Updated list
+/// *   Querying date properties like weekday, ordinal day, leap year status, season, etc.
 ///
 /// **Supported Range:** The struct supports Persian years from 1 up to 9999, inclusive.
 /// Operations resulting in dates outside this range will typically return an error.
@@ -762,11 +759,12 @@ impl ParsiDate {
     /// ```rust
     /// use parsidate::ParsiDate;
     ///
-    /// assert!(ParsiDate::is_persian_leap_year(1399)); // 1399 % 33 = 30 -> Leap
-    /// assert!(!ParsiDate::is_persian_leap_year(1400)); // 1400 % 33 = 1 -> Common (Rule based on remainders 1,5,9,13,17,22,26,30)
-    /// assert!(ParsiDate::is_persian_leap_year(1403));  // 1403 % 33 = 5 -> Leap
-    /// assert!(!ParsiDate::is_persian_leap_year(1404)); // 1404 % 33 = 6 -> Common
-    /// assert!(ParsiDate::is_persian_leap_year(1408));  // 1408 % 33 = 10 -> Leap
+    /// //Rule based on remainders 1,5,9,13,17,22,26,30
+    /// assert!(ParsiDate::is_persian_leap_year(1399));  // 1399 % 33 = 13 -> Leap
+    /// assert!(!ParsiDate::is_persian_leap_year(1400)); // 1400 % 33 = 14 -> Common
+    /// assert!(ParsiDate::is_persian_leap_year(1403));  // 1403 % 33 = 17 -> Leap
+    /// assert!(!ParsiDate::is_persian_leap_year(1404)); // 1404 % 33 = 18 -> Common
+    /// assert!(ParsiDate::is_persian_leap_year(1408));  // 1408 % 33 = 22 -> Leap
     /// assert!(!ParsiDate::is_persian_leap_year(0));    // Year 0 is not considered leap
     /// assert!(!ParsiDate::is_persian_leap_year(-5));   // Negative years are not considered leap
     /// ```
@@ -946,20 +944,20 @@ impl ParsiDate {
     /// // A date later in the year
     /// let mordad_2nd = ParsiDate::new(1403, 5, 2).unwrap(); // Ordinal 126
     /// // Calculation: first day weekday=4. effective_ordinal = 126 + 4 = 130.
-    /// // week = (130 - 1) / 7 + 1 = 129 / 7 + 1 = 18 + 1 = 19
+    /// // week = 130 / 7 = 19
     /// assert_eq!(mordad_2nd.week_of_year(), Ok(19));
     ///
     /// // Last day of leap year 1403 (Esfand 30th, Thursday, weekday 5, ordinal 366)
     /// let end_of_1403 = ParsiDate::new(1403, 12, 30).unwrap();
     /// // Calculation: first day weekday=4. effective_ordinal = 366 + 4 = 370.
-    /// // week = (370 - 1) / 7 + 1 = 369 / 7 + 1 = 52 + 1 = 53
+    /// // week = 370 / 7 = 53
     /// assert_eq!(end_of_1403.week_of_year(), Ok(53));
     ///
     /// // Last day of common year 1404 (Esfand 29th, Friday, weekday 6, ordinal 365)
     /// // Farvardin 1st, 1404 was a Friday (weekday 6)
     /// let end_of_1404 = ParsiDate::new(1404, 12, 29).unwrap();
     /// // Calculation: first day weekday=6. effective_ordinal = 365 + 6 = 371.
-    /// // week = (371 - 1) / 7 + 1 = 370 / 7 + 1 = 52 + 1 = 53
+    /// // week = 371 / 7 = 53
     /// assert_eq!(end_of_1404.week_of_year(), Ok(53));
     /// ```
     pub fn week_of_year(&self) -> Result<u32, DateError> {
@@ -1128,7 +1126,7 @@ impl ParsiDate {
         // Store the Result to handle potential errors during calculation only once.
         let mut weekday_name_cache: Option<Result<String, DateError>> = None;
         let mut ordinal_day_cache: Option<Result<u32, DateError>> = None;
-        let mut weekday_num_cache: Option<Result<u32, DateError>> = None; // Saturday = 0
+        let mut weekday_num_cache: Option<Result<u32, DateError>> = None;
         let mut season_cache: Option<Result<Season, DateError>> = None;
         let mut week_of_year_cache: Option<Result<u32, DateError>> = None;
 
@@ -1186,7 +1184,7 @@ impl ParsiDate {
                             Err(_) => result.push_str("???"),
                         }
                     }
-                    // %K -> Full Persian season name // <-- NEW SPECIFIER
+                    // %K -> Full Persian season name //
                     Some('K') => {
                         // Calculate or retrieve cached season.
                         if season_cache.is_none() {
@@ -1264,7 +1262,7 @@ impl ParsiDate {
     /// *   `ParseErrorKind::FormatMismatch`: The input string `s` does not structurally match the `format` string (e.g., wrong separators, missing components, extra trailing characters).
     /// *   `ParseErrorKind::InvalidNumber`: A numeric component (`%Y`, `%m`, `%d`) could not be parsed as a number, or it did not contain the required number of digits (4 for `%Y`, 2 for `%m`/`%d`).
     /// *   `ParseErrorKind::InvalidMonthName`: The input string did not contain a valid, recognized Persian month name where `%B` was expected in the format.
-    /// *   `ParseErrorKind::UnsupportedSpecifier`: The `format` string included a specifier not supported for parsing (e.g., `%A`, `%j`, `%K`). // <-- Mentioned %K here
+    /// *   `ParseErrorKind::UnsupportedSpecifier`: The `format` string included a specifier not supported for parsing (e.g., `%A`, `%j`, `%K`).
     /// *   `ParseErrorKind::InvalidDateValue`: The year, month, and day values were successfully extracted according to the format, but they do not form a logically valid Persian date (e.g., "1404/12/30" where 1404 is not a leap year; "1403/07/31" where Mehr has only 30 days). This is checked by the final internal call to `ParsiDate::new`.
     ///
     /// # Examples
@@ -1537,7 +1535,7 @@ impl ParsiDate {
 
         // 4. Remap chrono's Sunday=0..Saturday=6 to Persian Saturday=0..Friday=6.
         // The mapping is: (chrono_num + 1) % 7
-        // Sun (0) -> (0+1)%7 = 1 (EkShanbe)
+        // Sun (0) -> (0+1)%7 = 1 (YekShanbe)
         // Mon (1) -> (1+1)%7 = 2 (DoShanbe)
         // ...
         // Fri (5) -> (5+1)%7 = 6 (Jomeh)
@@ -1627,7 +1625,7 @@ impl ParsiDate {
         Ok(accumulated_days)
     }
 
-    // --- Season Information --- // <-- NEW SECTION
+    // --- Season Information ---
 
     /// Returns the Persian season this date falls into.
     ///

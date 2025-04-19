@@ -9,7 +9,6 @@
 //
 //! # ParsiDate: Comprehensive Persian (Jalali) Calendar Implementation in Rust
 
-//!
 //! This crate provides comprehensive functionality for working with the Persian (Jalali or Shamsi) calendar system.
 //! It allows for:
 //!
@@ -24,6 +23,7 @@
 //! *   **Helper Functions:** Easily get the first/last day of the month/year or manipulate date/time components.
 //! *   **Current Date:** Get the current system date as a `ParsiDate`.
 //! *   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
+//! *   **Seasons:** Get the current season based on the Persian date.
 //! *   **Serde Support:** Optional serialization/deserialization using the `serde` feature.
 //!
 //! It relies on the `chrono` crate for underlying Gregorian date representations, current time, and some calculations.
@@ -73,6 +73,18 @@
 //! // Current DateTime
 //! let now_dt = ParsiDateTime::now().unwrap();
 //! println!("Current Persian DateTime: {}", now_dt);
+//!
+//! // // Week of Year
+//! let week_of_year = pdt.week_of_year();
+//! assert_eq!(week_of_year, 19);
+//!
+//! // // Seasons
+//! let season = pdt.season();
+//! assert_eq!(season, Season::Summer); // Assuming 1403/05/02 is in summer
+//!
+//! // // Weekday Calculation
+//! let weekday = pdt.weekday();
+//! assert_eq!(weekday, "سه‌شنبه"); // Assuming 1403/05/02 is a Tuesday
 //!
 //! // --- Serde (requires 'serde' feature) ---
 //! #[cfg(feature = "serde")]
