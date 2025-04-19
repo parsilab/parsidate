@@ -1,13 +1,18 @@
 # Changelog
 
-## [1.6.0] - 2025-04-15
+All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.6.0] - 2025-04-15 
+Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
 ### Added
   *   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
       *   Added `.week_of_year()-> Result<u32, DateError>` method to `ParsiDate` and `ParsiDateTime` to determine the week of the year for a given date.
 
 ## [1.5.0] - 2025-04-12
-
+Sign: parsidate-20250412-5b5da84ef2a0-e257858a7eca95f93b008ec2a96edf6d
 ### Added
 
 *   **Persian Season Support:**
