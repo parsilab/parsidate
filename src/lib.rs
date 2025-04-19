@@ -32,7 +32,7 @@
 //!
 //! ```rust
 //! use chrono::{NaiveDate, NaiveDateTime, Duration};
-//! use parsidate::{ParsiDate, ParsiDateTime, DateError}; // Import both
+//! use parsidate::{ParsiDate, ParsiDateTime, DateError,Season}; // Import both
 //!
 //! // --- ParsiDate Usage (Date only) ---
 //! let pd = ParsiDate::new(1403, 5, 2).unwrap();
@@ -76,15 +76,15 @@
 //!
 //! // // Week of Year
 //! let week_of_year = pdt.week_of_year();
-//! assert_eq!(week_of_year, 19);
+//! assert_eq!(week_of_year, Ok(19));
 //!
 //! // // Seasons
 //! let season = pdt.season();
-//! assert_eq!(season, Season::Summer); // Assuming 1403/05/02 is in summer
+//! assert_eq!(season, Ok(Season::Tabestan)); // Assuming 1403/05/02 is in summer
 //!
 //! // // Weekday Calculation
-//! let weekday = pdt.weekday();
-//! assert_eq!(weekday, "سه‌شنبه"); // Assuming 1403/05/02 is a Tuesday
+//! let weekday = pd.weekday();
+//! assert_eq!(weekday, Ok("سه‌شنبه".to_string())); // Assuming 1403/05/02 is a Tuesday
 //!
 //! // --- Serde (requires 'serde' feature) ---
 //! #[cfg(feature = "serde")]
