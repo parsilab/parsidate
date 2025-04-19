@@ -10,10 +10,10 @@
 //! Contains the `ParsiDateTime` struct definition and its implementation for handling
 //! date and time within the Persian (Jalali or Shamsi) calendar system.
 
-use crate::constants::MONTH_NAMES_PERSIAN; // Reuse constants for month names
+use crate::constants::MONTH_NAMES_PERSIAN;
 use crate::date::ParsiDate;
 use crate::error::{DateError, ParseErrorKind};
-use crate::season::Season; // <-- Import the Season enum
+use crate::season::Season;
 use chrono::{Duration, Local, NaiveDateTime, Timelike};
 use std::fmt;
 use std::ops::{Add, Sub};
@@ -793,7 +793,7 @@ impl ParsiDateTime {
         // Caching results for potentially expensive date calculations if used multiple times
         let mut weekday_name_cache: Option<Result<String, DateError>> = None;
         let mut ordinal_day_cache: Option<Result<u32, DateError>> = None;
-        let mut weekday_num_cache: Option<Result<u32, DateError>> = None; // Saturday = 0
+        let mut weekday_num_cache: Option<Result<u32, DateError>> = None;
         let mut season_cache: Option<Result<Season, DateError>> = None;
         let mut week_of_year_cache: Option<Result<u32, DateError>> = None;
 
@@ -1751,7 +1751,7 @@ impl ParsiDateTime {
         })
     }
 
-    // --- Season Boundaries --- //
+    // --- Season Boundaries ---
 
     /// Returns the `ParsiDateTime` corresponding to the first day of the season this date falls into,
     /// preserving the original time component.
