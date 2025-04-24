@@ -1,0 +1,36 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "discussion"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thanks for suggesting a feature for ParsiDate!**
+        Tell us what you're thinking and why it's useful.
+  - type: textarea
+    id: feature
+    attributes:
+      label: Describe the feature
+      description: What's the new functionality you're suggesting?
+      placeholder: I'd like a function that calculates the week number...
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why is it needed?
+      description: What's the use case? Why is it important or useful?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Are there any workarounds you tried?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct
+          required: true

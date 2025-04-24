@@ -1,0 +1,28 @@
+name: Documentation Request
+description: Suggest documentation improvements or additions
+title: "[Docs]: "
+labels: ["documentation"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Something unclear or missing in the docs? Tell us!**
+  - type: textarea
+    id: what
+    attributes:
+      label: What's missing or unclear?
+      placeholder: The `ParsiDateTime` example isn't very clear...
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: How can we improve the documentation?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct
+          required: true

@@ -1,0 +1,35 @@
+name: Compatibility Issue
+description: Report an incompatibility with other libraries or platforms
+title: "[Compatibility]: "
+labels: ["compatibility", "bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Running into a compatibility issue with another crate or system?**
+  - type: input
+    id: affected
+    attributes:
+      label: Affected crate/system
+      placeholder: chrono, wasm32, Windows, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: Describe the incompatibility
+      placeholder: ParsiDate doesn't compile on wasm32 because...
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Any known workaround?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct
+          required: true

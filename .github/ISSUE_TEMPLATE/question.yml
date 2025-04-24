@@ -1,0 +1,30 @@
+name: Question
+description: Ask a question or request clarification
+title: "[Question]: "
+labels: ["question"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Got a question about ParsiDate?**
+        Ask away! We'll do our best to answer.
+  - type: textarea
+    id: question
+    attributes:
+      label: What's your question?
+      placeholder: I'm not sure how to convert a date from...
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Context
+      description: Optional – why you're asking or what you're working on.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct
+          required: true
