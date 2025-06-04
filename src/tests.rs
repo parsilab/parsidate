@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.6.0
+//  * Version : 1.6.1
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
+//  * Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
 //
 //! Unit tests for the parsidate library.
 
@@ -69,7 +69,8 @@ mod datetime_tests {
         assert!(pdt(1403, 12, 30, 23, 59, 59).is_valid()); // Leap year end, valid time
         assert!(!unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 10, 0, 0) }.is_valid()); // Invalid date part
         assert!(!unsafe { ParsiDateTime::new_unchecked(1403, 12, 30, 24, 0, 0) }.is_valid()); // Invalid time part
-        assert!(!unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 24, 0, 0) }.is_valid()); // Both invalid
+        assert!(!unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 24, 0, 0) }.is_valid());
+        // Both invalid
     }
 
     // --- Conversion Tests ---
@@ -120,7 +121,8 @@ mod datetime_tests {
 
         let invalid_dt_date = unsafe { ParsiDateTime::new_unchecked(1404, 12, 30, 10, 0, 0) };
         assert!(!invalid_dt_date.is_valid());
-        assert_eq!(invalid_dt_date.to_gregorian(), Err(DateError::InvalidDate)); // Fails validation
+        assert_eq!(invalid_dt_date.to_gregorian(), Err(DateError::InvalidDate));
+        // Fails validation
     }
 
     #[test]
@@ -154,26 +156,26 @@ mod datetime_tests {
         assert_eq!(pd(1403, 1, 1).week_of_year(), Ok(1)); // Wed
         assert_eq!(pd(1403, 1, 2).week_of_year(), Ok(1)); // Thu
         assert_eq!(pd(1403, 1, 3).week_of_year(), Ok(1)); // Fri
-        // Start of week 2
+                                                          // Start of week 2
         assert_eq!(pd(1403, 1, 4).week_of_year(), Ok(2)); // Sat
         assert_eq!(pd(1403, 1, 10).week_of_year(), Ok(2)); // Fri
-        // Start of week 3
+                                                           // Start of week 3
         assert_eq!(pd(1403, 1, 11).week_of_year(), Ok(3)); // Sat
-        // Mid-year
+                                                           // Mid-year
         assert_eq!(pd(1403, 5, 2).week_of_year(), Ok(19)); // Ordinal 126 -> Effective 130 -> Week 19
-        // End of year
+                                                           // End of year
         assert_eq!(pd(1403, 12, 29).week_of_year(), Ok(53)); // Ordinal 365 -> Effective 369 -> Week 53
         assert_eq!(pd(1403, 12, 30).week_of_year(), Ok(53)); // Ordinal 366 -> Effective 370 -> Week 53
 
         // --- Year 1404 (Common Year, starts on Friday - weekday 6) ---
         // First day is week 1
         assert_eq!(pd(1404, 1, 1).week_of_year(), Ok(1)); // Fri
-        // Start of week 2
+                                                          // Start of week 2
         assert_eq!(pd(1404, 1, 2).week_of_year(), Ok(2)); // Sat
         assert_eq!(pd(1404, 1, 8).week_of_year(), Ok(2)); // Fri
-        // Start of week 3
+                                                          // Start of week 3
         assert_eq!(pd(1404, 1, 9).week_of_year(), Ok(3)); // Sat
-        // End of year
+                                                          // End of year
         assert_eq!(pd(1404, 12, 28).week_of_year(), Ok(53)); // Ordinal 364 -> Effective 370 -> Week 53
         assert_eq!(pd(1404, 12, 29).week_of_year(), Ok(53)); // Ordinal 365 -> Effective 371 -> Week 53
 
@@ -277,12 +279,12 @@ mod datetime_tests {
             dt.add_duration(Duration::seconds(50)),
             Ok(pdt(1403, 5, 2, 10, 31, 5))
         ); // Cross minute
-        // Add minutes
+           // Add minutes
         assert_eq!(
             dt.add_duration(Duration::minutes(35)),
             Ok(pdt(1403, 5, 2, 11, 5, 15))
         ); // Cross hour
-        // Add hours
+           // Add hours
         assert_eq!(
             dt.add_duration(Duration::hours(14)),
             Ok(pdt(1403, 5, 3, 0, 30, 15))
@@ -334,13 +336,13 @@ mod datetime_tests {
 
         // Add months (clamps day, preserves time)
         assert_eq!(dt.add_months(6), Ok(pdt(1403, 7, 30, 12, 0, 0))); // To Mehr (30d), clamped
-        // Sub months
+                                                                      // Sub months
         assert_eq!(dt.sub_months(1), Ok(pdt(1402, 12, 29, 12, 0, 0))); // To Esfand (common), clamped
 
         // Add years (adjusts leap day, preserves time)
         let dt_leap = pdt(1403, 12, 30, 10, 0, 0);
         assert_eq!(dt_leap.add_years(1), Ok(pdt(1404, 12, 29, 10, 0, 0))); // Clamp day
-        // Sub years
+                                                                           // Sub years
         assert_eq!(dt_leap.sub_years(4), Ok(pdt(1399, 12, 30, 10, 0, 0))); // To leap year
 
         // Test preservation of time precisely
@@ -428,7 +430,7 @@ mod datetime_tests {
 } // end mod datetime_tests
 
 // Import necessary items from the library crate root and chrono
-use crate::{DateError, MAX_PARSI_DATE, MIN_PARSI_DATE, ParseErrorKind, ParsiDate};
+use crate::{DateError, ParseErrorKind, ParsiDate, MAX_PARSI_DATE, MIN_PARSI_DATE};
 use chrono::{Datelike, NaiveDate};
 
 // Helper function to create a ParsiDate for tests, panicking on failure.
@@ -857,7 +859,7 @@ fn test_format_strftime() {
 
     // Test formatting of potentially invalid date (via unsafe)
     let invalid_date = unsafe { ParsiDate::new_unchecked(1400, 13, 1) }; // Invalid month 13
-    // Behavior here depends on implementation; robust formatting handles invalid components gracefully.
+                                                                         // Behavior here depends on implementation; robust formatting handles invalid components gracefully.
     assert!(
         invalid_date.format("%Y/%m/%d").contains("1400/13/01"),
         "Display might show raw invalid data"
@@ -1130,7 +1132,7 @@ fn test_ordinal() {
     assert_eq!(pd(1403, 12, 30).ordinal(), Ok(366)); // Last day of leap year 1403
     assert_eq!(pd(1404, 1, 1).ordinal(), Ok(1)); // First day of common year 1404
     assert_eq!(pd(1404, 12, 29).ordinal(), Ok(365)); // Last day of common year 1404
-    // Test on invalid date
+                                                     // Test on invalid date
     let invalid_date = unsafe { ParsiDate::new_unchecked(1404, 12, 30) };
     assert_eq!(invalid_date.ordinal(), Err(DateError::InvalidDate)); // Fails validation
 }
@@ -1179,7 +1181,7 @@ fn test_add_sub_days() {
     let large_days = i64::MAX / 10; // Still huge, but less likely to hit chrono internal limits immediately
     let far_future_result = base.add_days(large_days);
     assert!(far_future_result.is_err()); // Expecting some error
-    // println!("Adding large days result: {:?}", far_future_result.unwrap_err()); // Check specific error if needed
+                                         // println!("Adding large days result: {:?}", far_future_result.unwrap_err()); // Check specific error if needed
 
     let far_past_result = base.add_days(-large_days);
     assert!(far_past_result.is_err());
@@ -1385,7 +1387,7 @@ fn test_days_between() {
     // Longer duration test
     let d_start = pd(1357, 11, 22); // Gregorian: 1979-02-11
     let d_end = pd(1403, 5, 2); // Gregorian: 2024-07-23
-    // Verify using chrono
+                                // Verify using chrono
     let g_start = NaiveDate::from_ymd_opt(1979, 2, 11).unwrap();
     let g_end = NaiveDate::from_ymd_opt(2024, 7, 23).unwrap();
     let expected_diff = g_end.signed_duration_since(g_start).num_days(); // Should be positive
@@ -1642,7 +1644,7 @@ fn test_constants_validity_and_values() {
 #[cfg(feature = "serde")]
 mod serde_tests {
     use super::*; // Import items from outer scope
-    //use serde_json; // Assuming serde_json is a dev-dependency
+                  //use serde_json; // Assuming serde_json is a dev-dependency
 
     #[test]
     fn test_serialization_deserialization_valid() {
@@ -1780,13 +1782,13 @@ mod season_tests {
         // Bahar
         assert_eq!(pd(1403, 1, 1).season(), Ok(Season::Bahar)); // Farvardin
         assert_eq!(pd(1403, 3, 31).season(), Ok(Season::Bahar)); // Khordad
-        // Tabestan
+                                                                 // Tabestan
         assert_eq!(pd(1403, 4, 1).season(), Ok(Season::Tabestan)); // Tir
         assert_eq!(pd(1403, 6, 31).season(), Ok(Season::Tabestan)); // Sharivar
-        // Paeez
+                                                                    // Paeez
         assert_eq!(pd(1403, 7, 1).season(), Ok(Season::Paeez)); // Mehr
         assert_eq!(pd(1403, 9, 30).season(), Ok(Season::Paeez)); // Azar
-        // Zemestan
+                                                                 // Zemestan
         assert_eq!(pd(1403, 10, 1).season(), Ok(Season::Zemestan)); // Dey
         assert_eq!(pd(1403, 12, 30).season(), Ok(Season::Zemestan)); // Esfand (leap year)
         assert_eq!(pd(1404, 10, 1).season(), Ok(Season::Zemestan)); // Dey
