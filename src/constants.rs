@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.6.0
+//  * Version : 1.6.1
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
+//  * Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
 //
 //! Contains constant definitions used throughout the parsidate library.
 

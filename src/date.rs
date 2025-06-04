@@ -3,9 +3,9 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.6.0
+//  * Version : 1.6.1
 //  * URL     : https://github.com/jalalvandi/parsidate
-//  * Sign: parsidate-20250415-a7a78013d25e-f7c1ad27b18ba6d800f915500eda993f
+//  * Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
 //
 //! Contains the `ParsiDate` struct definition and its implementation for handling
 //! dates within the Persian (Jalali or Shamsi) calendar system.
@@ -246,7 +246,7 @@ impl ParsiDate {
             if day <= *length {
                 // The remaining 'day' value falls within this month's length.
                 month = (m_idx + 1) as u32; // Found the month (m_idx is 0-based, month is 1-based)
-                // The 'day' value at this point is the correct day of the month.
+                                            // The 'day' value at this point is the correct day of the month.
                 break; // Exit the loop
             }
             // Subtract the full length of the current month and proceed to the next.
@@ -1117,7 +1117,7 @@ impl ParsiDate {
     pub fn format_strftime(&self, pattern: &str) -> String {
         // Preallocate string capacity for potentially better performance.
         let mut result = String::with_capacity(pattern.len() + 10); // Estimate a bit extra
-        // Use a character iterator to handle multi-byte characters in the pattern correctly.
+                                                                    // Use a character iterator to handle multi-byte characters in the pattern correctly.
         let mut chars = pattern.chars().peekable();
 
         // --- Caching Results ---
@@ -1301,7 +1301,8 @@ impl ParsiDate {
             if fmt_bytes[0] == b'%' {
                 // Ensure there's a character after '%'
                 if fmt_bytes.len() < 2 {
-                    return Err(DateError::ParseError(ParseErrorKind::FormatMismatch)); // Dangling %
+                    return Err(DateError::ParseError(ParseErrorKind::FormatMismatch));
+                    // Dangling %
                 }
 
                 // Match the specifier character (fmt_bytes[1])
@@ -1325,7 +1326,8 @@ impl ParsiDate {
                         // Parse the 4 digits (unsafe from_utf8 is safe here)
                         let year_str = unsafe { std::str::from_utf8_unchecked(&s_bytes[0..4]) };
                         parsed_year = Some(year_str.parse().map_err(|_| {
-                            DateError::ParseError(ParseErrorKind::InvalidNumber) // Should not fail, but handle defensively
+                            DateError::ParseError(ParseErrorKind::InvalidNumber)
+                            // Should not fail, but handle defensively
                         })?);
                         // Consume 4 digits from input and '%Y' from format
                         s_bytes = &s_bytes[4..];
