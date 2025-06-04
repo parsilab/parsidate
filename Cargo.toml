@@ -6,7 +6,7 @@
 [package]
 name = "parsidate" 
 version = "1.6.0"
-edition = "2024"
+edition = "2021"
 description = "A comprehensive library for working with the Persian (Jalali/Shamsi) calendar system in Rust."
 license = "Apache-2.0" 
 authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
@@ -16,7 +16,7 @@ readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
 keywords = ["date", "jalali","calendar","persian","shamsi"]
 categories = ["date-and-time", "localization","internationalization"]
-rust-version = "1.85"
+rust-version = "1.70"
 
 [lib]
 name = "parsidate"
@@ -28,8 +28,17 @@ maintenance = { status = "actively-developed" }
 [dependencies]
 chrono = "^0.4"
 serde = { version = "^1.0", optional = true, features = ["derive"] }
-serde_json = "1.0"
+serde_json = { version = "1.0", optional = true }
+
+[dev-dependencies]
+serde_json = "1.0"  # Required for tests
 
 [features]
 default = ["serde"]
+full = ["serde", "json"]
 serde = ["dep:serde"]
+json = ["serde", "dep:serde_json"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
