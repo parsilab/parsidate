@@ -1,7 +1,7 @@
 # ParsiDate: Comprehensive Persian Calendar Date & Time for Rust
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
-[![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.6.0)](https://docs.rs/parsidate/latest/parsidate/)
+[![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.7.0)](https://docs.rs/parsidate/latest/parsidate/)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)](https://crates.io/crates/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml)
@@ -36,7 +36,7 @@ Add `parsidate` and its required dependency `chrono` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-parsidate = "1.6.1"
+parsidate = "1.7.0"
 chrono = "0.4"
 ```
 
@@ -44,12 +44,12 @@ For serialization support, you can enable the features you need:
 
 ```toml
 [dependencies]
-parsidate = { version = "1.6.1", features = ["serde"] }
+parsidate = { version = "1.7.0", features = ["serde"] }
 chrono = "0.4"
 serde = { version = "1.0", features = ["derive"] }  # Required for derive macros
 
 # OR for full serialization support including JSON:
-parsidate = { version = "1.6.0", features = ["full"] }
+parsidate = { version = "1.7.0", features = ["full"] }
 chrono = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 ```
@@ -306,6 +306,6 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 Licensed under the [Apache License, Version 2.0](./LICENSE).
 
 ```
-Version:1.6.1
-Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
+Version:1.7.0
+Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 ```
