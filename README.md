@@ -1,5 +1,5 @@
 
-# ParsiDate: Comprehensive Persian Calendar Date & Time for Rust
+# ParsiDate: Comprehensive Persian Calendar Date & Time for Rust 
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
 [![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/latest)](https://docs.rs/parsidate/latest/parsidate/)
