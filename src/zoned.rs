@@ -367,7 +367,7 @@ impl<Tz: TimeZone> Eq for ZonedParsiDateTime<Tz> where DateTime<Tz>: Eq {}
 /// The comparison is based on the absolute instant in time.
 impl<Tz: TimeZone> PartialOrd for ZonedParsiDateTime<Tz> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.inner.partial_cmp(&other.inner)
+        Some(self.cmp(other))
     }
 }
 
