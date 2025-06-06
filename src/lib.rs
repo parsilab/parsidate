@@ -3,7 +3,7 @@
 //  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.6.1
+//  * Version : 1.7.0
 //  * URL     : https://github.com/jalalvandi/parsidate
 //  * Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
 //
@@ -24,6 +24,7 @@
 //! *   **Current Date:** Get the current system date as a `ParsiDate`.
 //! *   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
 //! *   **Seasons:** Get the current season based on the Persian date.
+//! *   **Timezone Support:** Create timezone-aware datetimes and perform conversions between timezones (requires the `timezone` feature).
 //! *   **Serde Support:** Optional serialization/deserialization using the `serde` feature.
 //!
 //! It relies on the `chrono` crate for underlying Gregorian date representations, current time, and some calculations.
@@ -74,17 +75,40 @@
 //! let now_dt = ParsiDateTime::now().unwrap();
 //! println!("Current Persian DateTime: {}", now_dt);
 //!
-//! // // Week of Year
+//! // Week of Year
 //! let week_of_year = pdt.week_of_year();
 //! assert_eq!(week_of_year, Ok(19));
 //!
-//! // // Seasons
+//! // Seasons
 //! let season = pdt.season();
 //! assert_eq!(season, Ok(Season::Tabestan)); // Assuming 1403/05/02 is in summer
 //!
-//! // // Weekday Calculation
+//! // Weekday Calculation
 //! let weekday = pd.weekday();
 //! assert_eq!(weekday, Ok("سه‌شنبه".to_string())); // Assuming 1403/05/02 is a Tuesday
+//!
+//! // --- ZonedParsiDateTime (requires 'timezone' feature) ---
+//! #[cfg(feature = "timezone")]
+//! {
+//!     use parsidate::ZonedParsiDateTime;
+//!     use chrono_tz::Asia::Tehran;
+//!     use chrono_tz::Europe::London;
+//!
+//!     // Get the current time in a specific timezone
+//!     let tehran_now = ZonedParsiDateTime::now(Tehran);
+//!     println!("The current time in Tehran is: {}", tehran_now);
+//!
+//!     // Create a specific zoned time
+//!     let dt = ZonedParsiDateTime::new(1403, 8, 15, 12, 0, 0, Tehran).unwrap();
+//!     assert_eq!(dt.hour(), 12);
+//!
+//!     // Convert to another timezone
+//!     let london_dt = dt.with_timezone(&London);
+//!     println!("{} in Tehran is {} in London.", dt, london_dt);
+//!     // In winter, Tehran is UTC+3:30, London is UTC+0.
+//!     assert_eq!(london_dt.hour(), 8);
+//!     assert_eq!(london_dt.minute(), 30);
+//! }
 //!
 //! // --- Serde (requires 'serde' feature) ---
 //! #[cfg(feature = "serde")]
@@ -117,6 +141,7 @@
 //! ## Features
 //!
 //! *   `serde`: Enables serialization and deserialization support via the `serde` crate.
+//! *   `timezone`: Enables timezone-aware functionality via `ZonedParsiDateTime` and the `chrono-tz` crate.
 
 // Declare the modules within the src directory
 mod constants;
@@ -124,6 +149,11 @@ mod date;
 mod datetime;
 mod error;
 mod season;
+
+// Conditionally declare the new 'zoned' module.
+#[cfg(feature = "timezone")]
+mod zoned;
+
 // Conditionally declare the tests module
 #[cfg(test)]
 mod tests;
@@ -134,3 +164,7 @@ pub use date::ParsiDate;
 pub use datetime::ParsiDateTime;
 pub use error::{DateError, ParseErrorKind};
 pub use season::Season;
+
+// Conditionally re-export the new 'ZonedParsiDateTime' struct.
+#[cfg(feature = "timezone")]
+pub use zoned::ZonedParsiDateTime;
