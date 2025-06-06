@@ -1,251 +1,160 @@
+
 # ParsiDate: Comprehensive Persian Calendar Date & Time for Rust
 
 [![crates.io](https://img.shields.io/crates/v/parsidate.svg)](https://crates.io/crates/parsidate)
-[![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/1.7.0)](https://docs.rs/parsidate/latest/parsidate/)
+[![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/latest)](https://docs.rs/parsidate/latest/parsidate/)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)](https://crates.io/crates/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml)
 [![Lint](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml)
 ![Maintenance](https://img.shields.io/badge/maintained-actively-green)
 
-
-`parsidate` provides comprehensive functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust. It allows for seamless representation, conversion, validation, formatting, parsing, and arithmetic for both **dates (`ParsiDate`)** and **date-times (`ParsiDateTime`)**. It leverages the `chrono` crate for Gregorian representations, current time, and duration calculations.
+`parsidate` provides comprehensive functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust. It allows for seamless representation, conversion, validation, formatting, parsing, and arithmetic for **naive dates (`ParsiDate`)**, **naive date-times (`ParsiDateTime`)**, and **timezone-aware date-times (`ZonedParsiDateTime`)**. It leverages the `chrono` crate for Gregorian representations and duration calculations.
 
 ### ✨ Features
 
-*   **Date and DateTime Handling:** Represents both dates (`ParsiDate`) and date-times (`ParsiDateTime` with hour, minute, second).
-*   **Conversion:** Easily convert between `chrono::NaiveDate`/`NaiveDateTime` (Gregorian) and `ParsiDate`/`ParsiDateTime`.
-*   **Validation:** Check if combinations form valid Persian dates or date-times.
-*   **Formatting:** Display dates and times in various formats using custom `strftime`-like patterns with Persian names and time components.
-*   **Parsing:** Parse strings into `ParsiDate` or `ParsiDateTime` objects based on specified formats, including Persian month names and time components.
+*   **Three Core Types:**
+    *   `ParsiDate`: A naive date (year, month, day).
+    *   `ParsiDateTime`: A naive date and time (hour, minute, second).
+    *   `ZonedParsiDateTime`: A timezone-aware date and time, handling DST and offsets correctly (requires the `timezone` feature).
+*   **Conversion:** Easily convert between `chrono` types (`NaiveDate`, `NaiveDateTime`) and `parsidate` types.
+*   **Validation:** Robust validation to ensure all created dates and times are logically correct.
+*   **Formatting:** Display dates and times using `strftime`-like patterns with Persian names (`%B`, `%A`), seasons (`%K`), and time components (`%H`, `%M`, `%S`, `%T`).
+*   **Parsing:** Parse strings into `ParsiDate` or `ParsiDateTime` from various formats.
 *   **Arithmetic:**
-    *   Add or subtract days, months, and years to `ParsiDate` and `ParsiDateTime` (preserving time for the latter), correctly handling month lengths and leap years (including day clamping).
-    *   Add or subtract `chrono::Duration` to/from `ParsiDateTime` for precise time calculations.
-*   **Leap Year Calculation:** Determine if a Persian year is leap (using a 33-year cycle approximation) or if a Gregorian year is leap.
-*   **Date/Time Information:** Get the Persian weekday name (شنبه-جمعه), weekday number (0-6), ordinal day of the year (1-366), Persian season (`Season` enum), and access individual date/time components. 
-*   **Helpers:** Get the first/last day of the month/year/season, or create modified dates/datetimes easily (`with_year`, `with_month`, `with_day`, `with_hour`, `with_minute`, `with_second`, `with_time`). 
-*   **Current Date/Time:** Get the current system date (`ParsiDate::today()`) or date-time (`ParsiDateTime::now()`) as Persian objects.
-*   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
-*   **Season:** Display and work with Persian seasons (Spring, Summer, Autumn, Winter), get the Persian name of a season, determine the season for a given date, and access the start and end dates of each season.
-*   **Serde Support:** Optional serialization/deserialization for `ParsiDate`, `ParsiDateTime`, and `Season` via the `serde` feature flag.
+    *   Add or subtract days, months, and years, with correct handling of month lengths and leap years.
+    *   Add or subtract `chrono::Duration` for precise time calculations.
+*   **Date/Time Information:** Get the Persian weekday, ordinal day, season, week number, and access individual date/time components.
+*   **Helpers:** Easily get the first/last day of the month, year, or season, or create modified dates/datetimes (`with_year`, `with_hour`, etc.).
+*   **Current Time:** Get the current system date (`ParsiDate::today()`), naive datetime (`ParsiDateTime::now()`), or zoned datetime (`ZonedParsiDateTime::now(tz)`).
+*   **Serde Support:** Optional serialization/deserialization for all date/time types via the `serde` feature.
 *   **Range:** Supports Persian years from 1 to 9999.
 
-### ⚙️ Installation
+### ⚙️ Installation & Features
 
-Add `parsidate` and its required dependency `chrono` to your `Cargo.toml`:
+Add `parsidate` to your `Cargo.toml`. You can enable features based on your needs.
 
 ```toml
 [dependencies]
 parsidate = "1.7.0"
+# Add other dependencies as needed
 chrono = "0.4"
-```
-
-For serialization support, you can enable the features you need:
-
-```toml
-[dependencies]
-parsidate = { version = "1.7.0", features = ["serde"] }
-chrono = "0.4"
-serde = { version = "1.0", features = ["derive"] }  # Required for derive macros
-
-# OR for full serialization support including JSON:
-parsidate = { version = "1.7.0", features = ["full"] }
-chrono = "0.4"
-serde = { version = "1.0", features = ["derive"] }
 ```
 
 Available features:
-- `serde`: Enables basic serialization/deserialization support
-- `json`: Enables JSON serialization/deserialization (includes `serde`)
-- `full`: Enables all available features
+
+-   **`serde`** (default): Enables serialization and deserialization support via the `serde` crate.
+-   **`timezone`**: Enables the `ZonedParsiDateTime` struct and timezone functionality. Requires the `chrono-tz` crate.
+
+To enable specific features:
+
+```toml
+[dependencies]
+# Example: Enable both serde and timezone support
+parsidate = { version = "1.7.0", features = ["serde", "timezone"] }
+
+# For timezone support, you also need chrono-tz
+chrono-tz = "0.8"
+```
+
+The `full` feature enables all available features: `parsidate = { version = "1.7.0", features = ["full"] }`.
 
 ### 🚀 Usage Examples
 
+#### Naive Dates (`ParsiDate`)
+
 ```rust
-use chrono::{NaiveDate, NaiveDateTime, Duration};
-// Import Season along with other types
-use parsidate::{ParsiDate, ParsiDateTime, DateError, Season};
+use parsidate::{ParsiDate, DateError};
+use chrono::NaiveDate;
 
-// --- ParsiDate Usage (Date only) ---
-// Create a ParsiDate (validates on creation)
+// Creation and Validation
 let pd = ParsiDate::new(1403, 5, 2).unwrap(); // 2 Mordad 1403
-assert_eq!(pd.year(), 1403);
-assert_eq!(pd.month(), 5); // 5 = Mordad
-assert_eq!(pd.day(), 2);
+assert!(ParsiDate::new(1404, 12, 30).is_err()); // Invalid leap day
 
-// Check validity
-assert!(pd.is_valid());
-let invalid_date_res = ParsiDate::new(1404, 12, 30); // 1404 is not leap
-assert_eq!(invalid_date_res, Err(DateError::InvalidDate));
-
-// Gregorian to Persian Date
+// Conversion
 let g_date = NaiveDate::from_ymd_opt(2024, 7, 23).unwrap();
-let pd_from_g = ParsiDate::from_gregorian(g_date).unwrap();
-assert_eq!(pd_from_g, pd);
+assert_eq!(ParsiDate::from_gregorian(g_date).unwrap(), pd);
+assert_eq!(pd.to_gregorian().unwrap(), g_date);
 
-// Persian Date to Gregorian
-let g_date_conv = pd.to_gregorian().unwrap();
-assert_eq!(g_date_conv, g_date);
-
-// Formatting Date
-assert_eq!(pd.format("%Y-%m-%d is a %A"), "1403-05-02 is a سه‌شنبه");
+// Formatting & Parsing
 assert_eq!(pd.format("%d %B %Y"), "02 مرداد 1403");
-assert_eq!(pd.to_string(), "1403/05/02"); // Default Display
+assert_eq!(ParsiDate::parse("1403/05/02", "%Y/%m/%d").unwrap(), pd);
 
-// Parsing Date
-let parsed_short = ParsiDate::parse("1403/05/02", "%Y/%m/%d").unwrap();
-assert_eq!(parsed_short, pd);
-let parsed_long = ParsiDate::parse("02 مرداد 1403", "%d %B %Y").unwrap();
-assert_eq!(parsed_long, pd);
+// Arithmetic
+let next_day = pd.add_days(1).unwrap();
+assert_eq!(next_day, ParsiDate::new(1403, 5, 3).unwrap());
+```
 
-// Date Arithmetic
-let next_day_date = pd.add_days(1).unwrap();
-assert_eq!(next_day_date, ParsiDate::new(1403, 5, 3).unwrap());
-let prev_month_date = pd.sub_months(1).unwrap();
-assert_eq!(prev_month_date, ParsiDate::new(1403, 4, 2).unwrap()); // Tir 2nd
+#### Naive DateTimes (`ParsiDateTime`)
 
-// Get Today's Date
-match ParsiDate::today() {
-    Ok(today) => println!("Today's Persian date: {}", today.format("long")),
-    Err(e) => eprintln!("Error getting today's date: {}", e),
-}
+```rust
+use parsidate::{ParsiDateTime, DateError};
+use chrono::Duration;
 
-// --- ParsiDateTime Usage (Date and Time) ---
-// Create a ParsiDateTime (validates date and time)
+// Creation
 let pdt = ParsiDateTime::new(1403, 5, 2, 15, 30, 45).unwrap();
-assert_eq!(pdt.year(), 1403);
 assert_eq!(pdt.hour(), 15);
-assert_eq!(pdt.minute(), 30);
-assert_eq!(pdt.second(), 45);
-assert_eq!(pdt.date(), pd); // Access the ParsiDate part
 
-// Invalid time creation
-let invalid_time_res = ParsiDateTime::new(1403, 5, 2, 24, 0, 0);
-assert_eq!(invalid_time_res, Err(DateError::InvalidTime));
-
-// Gregorian DateTime to Persian DateTime
-let g_dt = NaiveDate::from_ymd_opt(2024, 7, 23).unwrap().and_hms_opt(15, 30, 45).unwrap();
-let pdt_from_g = ParsiDateTime::from_gregorian(g_dt).unwrap();
-assert_eq!(pdt_from_g, pdt);
-
-// Persian DateTime to Gregorian DateTime
-let g_dt_conv = pdt.to_gregorian().unwrap();
-assert_eq!(g_dt_conv, g_dt);
-
-// Formatting DateTime
+// Formatting & Parsing
 assert_eq!(pdt.format("%Y/%m/%d %H:%M:%S"), "1403/05/02 15:30:45");
-assert_eq!(pdt.format("%A %d %B ساعت %T"), "سه‌شنبه 02 مرداد ساعت 15:30:45");
-assert_eq!(pdt.to_string(), "1403/05/02 15:30:45"); // Default Display
+assert_eq!(ParsiDateTime::parse("1403-05-02T15:30:45", "%Y-%m-%dT%T").unwrap(), pdt);
 
-// Parsing DateTime
-let parsed_dt = ParsiDateTime::parse("1403/05/02 15:30:45", "%Y/%m/%d %H:%M:%S").unwrap();
-assert_eq!(parsed_dt, pdt);
-let parsed_dt_t = ParsiDateTime::parse("1403-05-02T15:30:45", "%Y-%m-%dT%T").unwrap();
-assert_eq!(parsed_dt_t, pdt);
-let parsed_dt_b = ParsiDateTime::parse("02 مرداد 1403 - 15:30:45", "%d %B %Y - %T").unwrap();
-assert_eq!(parsed_dt_b, pdt);
-
-// DateTime Arithmetic with Duration
+// Arithmetic
 let next_hour = pdt.add_duration(Duration::hours(1)).unwrap();
-assert_eq!(next_hour, ParsiDateTime::new(1403, 5, 2, 16, 30, 45).unwrap());
-let prev_minute_rollover = pdt.sub_duration(Duration::minutes(31)).unwrap();
-assert_eq!(prev_minute_rollover, ParsiDateTime::new(1403, 5, 2, 14, 59, 45).unwrap());
-// Using operators
-assert_eq!(pdt + Duration::seconds(15), Ok(ParsiDateTime::new(1403, 5, 2, 15, 31, 0).unwrap()));
+assert_eq!(next_hour.hour(), 16);
+let next_day_dt = pdt.add_days(1).unwrap(); // Preserves time
+assert_eq!(next_day_dt.day(), 3);
+```
 
-// DateTime Arithmetic with days/months/years (preserves time)
-let next_day_dt = pdt.add_days(1).unwrap();
-assert_eq!(next_day_dt, ParsiDateTime::new(1403, 5, 3, 15, 30, 45).unwrap());
-let next_month_dt = pdt.add_months(1).unwrap();
-assert_eq!(next_month_dt, ParsiDateTime::new(1403, 6, 2, 15, 30, 45).unwrap());
+#### Timezone-Aware DateTimes (`ZonedParsiDateTime`)
 
-// Modifying time components
-let pdt_morning = pdt.with_hour(9).unwrap();
-assert_eq!(pdt_morning.hour(), 9);
-let pdt_start_of_minute = pdt.with_second(0).unwrap();
-assert_eq!(pdt_start_of_minute.second(), 0);
+This functionality requires the `timezone` feature.
 
-// Get Current DateTime
-match ParsiDateTime::now() {
-    Ok(now) => println!("Current Persian DateTime: {}", now),
-    Err(e) => eprintln!("Error getting current DateTime: {}", e),
+```rust
+// This example needs the `timezone` feature enabled for `parsidate`
+// and the `chrono-tz` crate added to Cargo.toml.
+#[cfg(feature = "timezone")]
+{
+    use parsidate::ZonedParsiDateTime;
+    use chrono_tz::Asia::Tehran;
+    use chrono_tz::Europe::London;
+
+    // Get the current time in a specific timezone
+    let tehran_now = ZonedParsiDateTime::now(Tehran);
+    println!("The current time in Tehran is: {}", tehran_now);
+
+    // Create a specific zoned time
+    let dt = ZonedParsiDateTime::new(1403, 10, 10, 12, 0, 0, Tehran).unwrap();
+    assert_eq!(dt.hour(), 12);
+    // The default format includes the UTC offset
+    assert_eq!(dt.to_string(), "1403/10/10 12:00:00 +0330");
+
+    // Convert to another timezone
+    let london_dt = dt.with_timezone(&London);
+    // 12:00 in Tehran (UTC+3:30) is 8:30 in London (UTC+0)
+    assert_eq!(london_dt.hour(), 8);
+    assert_eq!(london_dt.minute(), 30);
+    println!("{} in Tehran is {} in London.", dt, london_dt);
 }
+```
 
-// --- Season Support Examples ---
-let winter_date = ParsiDate::new(1403, 11, 10).unwrap(); // Bahman 10th (Winter)
-let season = winter_date.season().unwrap();
-assert_eq!(season, Season::Zemestan);
-assert_eq!(season.name_persian(), "زمستان");
+#### Seasons and Other Helpers
+
+```rust
+use parsidate::{ParsiDate, Season};
+
+let winter_date = ParsiDate::new(1403, 11, 10).unwrap(); // Bahman 10th
+assert_eq!(winter_date.season().unwrap(), Season::Zemestan);
 assert_eq!(winter_date.format("%d %B is in %K"), "10 بهمن is in زمستان");
 
 // Get season boundaries
-let start_winter = winter_date.start_of_season().unwrap();
-let end_winter = winter_date.end_of_season().unwrap(); // 1403 is leap
-assert_eq!(start_winter, ParsiDate::new(1403, 10, 1).unwrap()); // Dey 1st
-assert_eq!(end_winter, ParsiDate::new(1403, 12, 30).unwrap()); // Esfand 30th
-
-// Season support works with ParsiDateTime too
-let dt_spring = ParsiDateTime::new(1404, 2, 20, 10, 0, 0).unwrap(); // Ordibehesht 20th (Spring)
-assert_eq!(dt_spring.season().unwrap(), Season::Bahar);
-assert_eq!(dt_spring.format("%Y/%m/%d (%K) %T"), "1404/02/20 (بهار) 10:00:00");
-let spring_end_dt = dt_spring.end_of_season().unwrap();
-assert_eq!(spring_end_dt.date(), ParsiDate::new(1404, 3, 31).unwrap()); // Khordad 31st
-assert_eq!(spring_end_dt.time(), (10, 0, 0)); // Time preserved
-```
-
-### Serialization/Deserialization Support (`serde` feature)
-
-```rust
-// --- Serde (Requires 'serde' feature) ---
-#[cfg(feature = "serde")]
-{
-    // Make sure serde_json is a dev-dependency or added normally
-    // use serde_json;
-    use parsidate::{ParsiDate, ParsiDateTime, Season}; // Need Season here too if used
-
-    // --- ParsiDate ---
-    let pd_serde = ParsiDate::new(1403, 5, 2).unwrap();
-    let json_pd = serde_json::to_string(&pd_serde).unwrap();
-    println!("Serialized ParsiDate: {}", json_pd); // Output: {"year":1403,"month":5,"day":2}
-
-    let deserialized_pd: ParsiDate = serde_json::from_str(&json_pd).unwrap();
-    assert_eq!(deserialized_pd, pd_serde);
-    assert!(deserialized_pd.is_valid());
-
-    // Note: Default deserialization doesn't validate logical correctness for ParsiDate.
-    let json_invalid_pd = r#"{"year":1404,"month":12,"day":30}"#; // Logically invalid
-    let deserialized_invalid_pd: ParsiDate = serde_json::from_str(json_invalid_pd).unwrap();
-    assert!(!deserialized_invalid_pd.is_valid());
-
-    // --- ParsiDateTime ---
-    let pdt_serde = ParsiDateTime::new(1403, 5, 2, 10, 20, 30).unwrap();
-    let json_pdt = serde_json::to_string(&pdt_serde).unwrap();
-    // Note the nested structure
-    println!("Serialized ParsiDateTime: {}", json_pdt); // Output: {"date":{"year":1403,"month":5,"day":2},"hour":10,"minute":20,"second":30}
-
-    let deserialized_pdt: ParsiDateTime = serde_json::from_str(&json_pdt).unwrap();
-    assert_eq!(deserialized_pdt, pdt_serde);
-    assert!(deserialized_pdt.is_valid());
-
-    // Deserialization doesn't validate logical correctness for ParsiDateTime either.
-    let json_invalid_pdt = r#"{"date":{"year":1403,"month":5,"day":2},"hour":25,"minute":0,"second":0}"#; // Invalid hour
-    let deserialized_invalid_pdt: ParsiDateTime = serde_json::from_str(json_invalid_pdt).unwrap();
-    assert!(!deserialized_invalid_pdt.is_valid()); // is_valid() check is needed
-    assert_eq!(deserialized_invalid_pdt.hour(), 25); // Field gets populated
-
-    // --- Season Enum ---
-    let season = Season::Paeez;
-    let json_season = serde_json::to_string(&season).unwrap();
-    println!("Serialized Season: {}", json_season); // Output: "Paeez" (enum variant name)
-
-    let deserialized_season: Season = serde_json::from_str(&json_season).unwrap();
-    assert_eq!(deserialized_season, Season::Paeez);
-}
+let end_of_winter = winter_date.end_of_season().unwrap(); // 1403 is a leap year
+assert_eq!(end_of_winter, ParsiDate::new(1403, 12, 30).unwrap());
 ```
 
 ### Formatting and Parsing Specifiers
 
-#### Formatting (`ParsiDate::format`, `ParsiDateTime::format`)
+The library supports `strftime`-like specifiers for formatting and parsing.
 
 | Specifier | Description                         | Example (`1403-05-02`, `15:30:45`) | Notes         |
 | :-------- | :---------------------------------- | :--------------------------------- | :------------ |
@@ -257,45 +166,18 @@ assert_eq!(spring_end_dt.time(), (10, 0, 0)); // Time preserved
 | `%w`      | Weekday as number (Saturday=0)      | `3`                                |               |
 | `%j`      | Day of year as zero-padded number   | `126`                              |               |
 | `%K`      | Full Persian season name            | `تابستان`                          |               |
-| `%H`      | Hour (24-hour clock), zero-padded   | `15`                               | DateTime only |
-| `%M`      | Minute, zero-padded                 | `30`                               | DateTime only |
-| `%S`      | Second, zero-padded                 | `45`                               | DateTime only |
-| `%T`      | Equivalent to `%H:%M:%S`            | `15:30:45`                         | DateTime only |
+| `%H`      | Hour (24-hour clock), zero-padded   | `15`                               | `ParsiDateTime` |
+| `%M`      | Minute, zero-padded                 | `30`                               | `ParsiDateTime` |
+| `%S`      | Second, zero-padded                 | `45`                               | `ParsiDateTime` |
+| `%T`      | Equivalent to `%H:%M:%S`            | `15:30:45`                         | `ParsiDateTime` |
 | `%W`      | Week number of the year             | `19`                               |               |
 | `%%`      | A literal `%` character             | `%`                                |               |
 
-#### Parsing (`ParsiDate::parse`, `ParsiDateTime::parse`)
-
-| Specifier | Description                         | Notes                                                     |
-| :-------- | :---------------------------------- | :-------------------------------------------------------- |
-| `%Y`      | Parses a 4-digit year               | Requires exactly 4 digits.                                |
-| `%m`      | Parses a 2-digit month (01-12)      | Requires exactly 2 digits.                                |
-| `%d`      | Parses a 2-digit day (01-31)        | Requires exactly 2 digits.                                |
-| `%B`      | Parses a full Persian month name    | Case-sensitive, matches names like "فروردین", "مرداد".    |
-| `%H`      | Parses a 2-digit hour (00-23)       | Requires exactly 2 digits. DateTime only.                 |
-| `%M`      | Parses a 2-digit minute (00-59)     | Requires exactly 2 digits. DateTime only.                 |
-| `%S`      | Parses a 2-digit second (00-59)     | Requires exactly 2 digits. DateTime only.                 |
-| `%T`      | Parses time in `HH:MM:SS` format    | Requires correct separators and 2 digits per component. DateTime only. |
-| `%%`      | Matches a literal `%` character     |                                                           |
-
-**Note:** Parsing requires the input string to **exactly** match the format string, including separators and the number of digits specified (e.g., `%d` requires `02`, not `2`). `%A`, `%w`, `%j`, `%K` are **not** supported for parsing. The final parsed date/time is validated logically (e.g., day exists in month, time components are in range). <!-- Added %K here -->
+**Note:** Parsing requires an exact match to the format string. Specifiers like `%A`, `%w`, `%j`, `%K`, and `%W` are not supported for parsing.
 
 ### ⚠️ Error Handling
 
-Most methods that can fail return a `Result<T, DateError>`. The `DateError` enum indicates the type of error:
-
-*   `InvalidDate`: Date components do not form a valid Persian date.
-*   `InvalidTime`: Time components (hour, minute, second) are out of range (e.g., hour 24). Specific to `ParsiDateTime`.
-*   `GregorianConversionError`: Error during Gregorian <=> Persian conversion (e.g., date out of supported range).
-*   `ParseError(ParseErrorKind)`: Input string failed to parse. `ParseErrorKind` gives specific details like:
-    *   `FormatMismatch`: Input doesn't match format structure/literals.
-    *   `InvalidNumber`: Failed to parse numeric component or wrong digit count.
-    *   `InvalidMonthName`: Failed to parse `%B`.
-    *   `UnsupportedSpecifier`: Used a format specifier not supported for parsing.
-    *   `InvalidDateValue`: Parsed date components are logically invalid.
-    *   `InvalidTimeValue`: Parsed time components are logically invalid.
-*   `ArithmeticOverflow`: Date/time arithmetic resulted in a value outside the supported range (Year 1-9999) or internal overflow (e.g., adding large `Duration`).
-*   `InvalidOrdinal`: Invalid day-of-year number provided (e.g., 0 or > 366).
+Most methods that can fail return a `Result<T, DateError>`. The `DateError` enum provides detailed information about the cause of failure, including `InvalidDate`, `InvalidTime`, `ParseError(ParseErrorKind)`, `GregorianConversionError`, and `ArithmeticOverflow`.
 
 ### Contributing
 
@@ -304,7 +186,6 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 ### 📄 License
 
 Licensed under the [Apache License, Version 2.0](./LICENSE).
-
 ```
 Version:1.7.0
 Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
