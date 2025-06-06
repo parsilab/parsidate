@@ -1,11 +1,11 @@
 #  * Cargo.toml
 #  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
-#  * Sign: parsidate-20250604-e62e50090da3-d83a3ca6effcd0c0090c02213ae867cb
+#  * Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 
 
 [package]
 name = "parsidate" 
-version = "1.6.1"
+version = "1.7.0"
 edition = "2021"
 description = "A comprehensive library for working with the Persian (Jalali/Shamsi) calendar system in Rust."
 license = "Apache-2.0" 
@@ -14,8 +14,8 @@ homepage = "https://crates.io/crates/parsidate"
 repository = "https://github.com/jalalvandi/ParsiDate"
 readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
-keywords = ["date", "jalali","calendar","persian","shamsi"]
-categories = ["date-and-time", "localization","internationalization"]
+keywords = ["date", "jalali", "calendar", "persian", "shamsi", "timezone"] 
+categories = ["date-and-time", "localization", "internationalization"]
 rust-version = "1.70"
 
 [lib]
@@ -28,16 +28,18 @@ maintenance = { status = "actively-developed" }
 [dependencies]
 chrono = "^0.4"
 serde = { version = "^1.0", optional = true, features = ["derive"] }
-serde_json = { version = "1.0", optional = true }
+chrono-tz = { version = "0.8", optional = true }
 
 [dev-dependencies]
-serde_json = "1.0"  # Required for tests
+serde_json = "1.0"
+chrono-tz = "0.8"
 
 [features]
 default = ["serde"]
-full = ["serde", "json"]
 serde = ["dep:serde"]
-json = ["serde", "dep:serde_json"]
+# json = ["serde", "dep:serde_json"]
+timezone = ["dep:chrono-tz"]
+full = ["serde", "timezone"]
 
 [package.metadata.docs.rs]
 all-features = true
