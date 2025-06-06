@@ -14,7 +14,7 @@ homepage = "https://crates.io/crates/parsidate"
 repository = "https://github.com/jalalvandi/ParsiDate"
 readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
-keywords = ["date", "jalali", "calendar", "persian", "shamsi", "timezone"] 
+keywords = ["date", "jalali", "calendar", "persian", "shamsi"] 
 categories = ["date-and-time", "localization", "internationalization"]
 rust-version = "1.70"
 
