@@ -1,8 +1,8 @@
-
+---
 ## title: ParsiDate layout: default
 
 # ParsiDate: Persian Date & Time Utilities for Rust
-
+---
 Welcome to **ParsiDate**, the comprehensive Rust library for working with the Persian (Jalali/Shamsi) calendar. Whether you're building a terminal app, a time-aware API, or just handling Persian date/time conversions, ParsiDate has you covered.
 
 &#x20;    &#x20;
