@@ -4,7 +4,7 @@
 //  * Package : parsidate
 //  * License : Apache-2.0
 //  * Version : 1.7.0
-//  * URL     : https://github.com/jalalvandi/parsidate
+//  * URL     : https://github.com/parsilab/parsidate
 //  * Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 //
 //! Unit tests for the parsidate library.

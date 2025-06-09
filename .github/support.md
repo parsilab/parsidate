@@ -12,13 +12,13 @@ Before opening an issue, please check out the official documentation:
 
 If you have a question or want to share an idea, use the GitHub Discussions:
 
-👉 [Discussions](https://github.com/jalalvandi/ParsiDate/discussions)
+👉 [Discussions](https://github.com/parsilab/ParsiDate/discussions)
 
 ## 🐞 Found a Bug?
 
 If you're sure it's a bug and not a usage question, open an issue:
 
-👉 [New Issue](https://github.com/jalalvandi/ParsiDate/issues/new/choose)
+👉 [New Issue](https://github.com/parsilab/ParsiDate/issues/new/choose)
 
 Please include as much detail as possible and a minimal reproducible example.
 
@@ -32,4 +32,4 @@ Instead, contact us privately at:
 ---
 
 Thanks again for being part of the community ❤️  
--ParsiDate Team
+-parsilab Team

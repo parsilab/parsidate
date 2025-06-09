@@ -1,13 +1,13 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💬 Ask a question or discuss
-    url: https://github.com/jalalvandi/ParsiDate/discussions
+    url: https://github.com/parsilab/ParsiDate/discussions
     about: Use GitHub Discussions to ask questions or chat with the community.
   - name: 📄 Read the contributing guide
-    url: https://github.com/jalalvandi/ParsiDate/blob/main/CONTRIBUTING.md
+    url: https://github.com/parsilab/ParsiDate/blob/main/CONTRIBUTING.md
     about: Learn how to report bugs and contribute to ParsiDate.
   - name: 📖 Read the documentation
     url: https://docs.rs/parsidate/
     about: Read the documentation for ParsiDate.
   - name: 📜 Read the changelog
-    url: https://github.com/jalalvandi/ParsiDate/blob/master/CHANGELOG.md
+    url: https://github.com/parsilab/ParsiDate/blob/master/CHANGELOG.md

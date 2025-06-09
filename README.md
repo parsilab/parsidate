@@ -5,8 +5,8 @@
 [![docs.rs (with version)](https://img.shields.io/docsrs/parsidate/latest)](https://docs.rs/parsidate/latest/parsidate/)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/parsidate)](https://crates.io/crates/parsidate)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-[![Tests](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/Tests.yml)
-[![Lint](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml/badge.svg)](https://github.com/jalalvandi/ParsiDate/actions/workflows/lint.yml)
+[![Tests](https://github.com/parsilab/ParsiDate/actions/workflows/Tests.yml/badge.svg)](https://github.com/parsilab/ParsiDate/actions/workflows/Tests.yml)
+[![Lint](https://github.com/parsilab/ParsiDate/actions/workflows/lint.yml/badge.svg)](https://github.com/parsilab/ParsiDate/actions/workflows/lint.yml)
 ![Maintenance](https://img.shields.io/badge/maintained-actively-green)
 
 `parsidate` provides comprehensive functionality for working with the Persian (Jalali/Shamsi) calendar system in Rust. It allows for seamless representation, conversion, validation, formatting, parsing, and arithmetic for **naive dates (`ParsiDate`)**, **naive date-times (`ParsiDateTime`)**, and **timezone-aware date-times (`ZonedParsiDateTime`)**. It leverages the `chrono` crate for Gregorian representations and duration calculations.
