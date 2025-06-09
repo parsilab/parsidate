@@ -1,24 +1,39 @@
 name: Lint
+
 permissions:
   contents: read
   pull-requests: write
+
 on:
   push:
     branches: [ master ]
+    paths:
+      - '**/*.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
   pull_request:
     branches: [ master ]
+    paths:
+      - '**/*.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
 
 jobs:
   lint:
+    name: Rust Linting
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable) + Clippy + Rustfmt
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           components: rustfmt, clippy
+
       - name: Check formatting
         run: cargo fmt --all -- --check
+
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
