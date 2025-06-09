@@ -1,4 +1,3 @@
----
 
 ## title: ParsiDate layout: default
 
@@ -8,7 +7,7 @@ Welcome to **ParsiDate**, the comprehensive Rust library for working with the Pe
 
 &#x20;    &#x20;
 
----
+
 
 ## 🚀 Features at a Glance
 
