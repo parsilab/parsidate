@@ -12,7 +12,7 @@ body:
     id: what
     attributes:
       label: What needs refactoring?
-      placeholder: The date parsing logic is too complex...
+      placeholder: The name parsing logic is too complex...
     validations:
       required: true
   - type: textarea

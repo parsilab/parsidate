@@ -1,5 +1,5 @@
 #  * Cargo.toml
-#  * Copyright (C) Mohammad (Sina) Jalalvandi (parsidate) 2024-2025 <jalalvandi.sina@gmail.com>
+#  * Copyright (C) ParsiCore (parsidate) 2024-2025 <parsicore.dev@gmail.com>
 #  * Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 
 
@@ -9,7 +9,7 @@ version = "1.7.0"
 edition = "2021"
 description = "A comprehensive library for working with the Persian (Jalali/Shamsi) calendar system in Rust."
 license = "Apache-2.0" 
-authors = ["Sina Jalalvandi <Jalalvandi.Sina@gmail.com>"] 
+authors = ["parsicore <parsicore.dev@gmail.com>"] 
 homepage = "https://crates.io/crates/parsidate"
 repository = "https://github.com/parsicore/ParsiDate"
 readme = "README.md"

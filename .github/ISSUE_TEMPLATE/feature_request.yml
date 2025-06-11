@@ -7,14 +7,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Thanks for suggesting a feature for ParsiDate!**
+        **Thanks for suggesting a feature for parsidate!**
         Tell us what you're thinking and why it's useful.
   - type: textarea
     id: feature
     attributes:
       label: Describe the feature
       description: What's the new functionality you're suggesting?
-      placeholder: I'd like a function that calculates the week number...
+      placeholder: I'd like a function that gets ...
     validations:
       required: true
   - type: textarea

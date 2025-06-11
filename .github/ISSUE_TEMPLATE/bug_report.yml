@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a reproducible bug in ParsiDate
+description: Report a reproducible bug in parsidate
 title: "[Bug]: "
 labels: ["bug", "triage"]
 assignees: []
@@ -7,46 +7,61 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Thanks for reporting a bug in ParsiDate!**
-        Please fill in the following to help us reproduce and fix the issue.
+        ## 🐛 Bug Report
+
+        Thanks for reporting a bug in **parsidate**!
+        Please provide the following information to help us reproduce and fix the issue.
+
   - type: input
     id: version
     attributes:
       label: Version
-      description: What version of ParsiDate are you using?
+      description: What version of parsidate are you using?
       placeholder: e.g. 0.3.2
     validations:
       required: true
+
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Describe the bug and how to reproduce it.
-      placeholder: A bug happened when I tried converting a date...
+      description: Describe the bug clearly and concisely.
+      placeholder: |
+        A bug happened when I tried getting city name from Yazd...
     validations:
       required: true
+
   - type: textarea
     id: expected
     attributes:
       label: What did you expect to happen?
-      description: What should have happened instead?
+      description: Describe what you expected instead.
+      placeholder: |
+        I expected get_city_by_id(123) to return "Yazd", but it returned null.
+
   - type: textarea
     id: reproduction
     attributes:
       label: Steps to reproduce
-      description: A minimal reproducible code or steps.
+      description: Provide a minimal code sample or detailed steps to reproduce.
       placeholder: |
-        1. Call `ParsiDate::from_gregorian(2023, 4, 20)`
-        2. ...
+        1. Call `get_cities_of_province(21)`
+        2. Observe the returned list is empty
+        3. ...
+
   - type: textarea
     id: logs
     attributes:
-      label: Logs or relevant output
+      label: Logs or Error Output
+      description: Paste any error messages or logs here.
       render: shell
+      placeholder: |
+        thread 'main' panicked at 'index out of bounds', src/lib.rs:42
+
   - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
       options:
-        - label: I agree to follow the Code of Conduct
+        - label: I agree to follow the [Code of Conduct](https://github.com/parsicore/parsidate/blob/main/CODE_OF_CONDUCT.md)
           required: true

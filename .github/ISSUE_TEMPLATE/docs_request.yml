@@ -1,28 +1,57 @@
-name: Documentation Request
-description: Suggest documentation improvements or additions
-title: "[Docs]: "
-labels: ["documentation"]
+# .github/ISSUE_TEMPLATE/docs_request.yml
+
+name: "📚 Documentation Request"
+description: "Suggest an improvement or addition to the documentation"
+title: "[Docs]: A brief summary of your suggestion"
+labels: ["documentation", "needs-triage"]
 assignees: []
+
 body:
   - type: markdown
     attributes:
       value: |
-        **Something unclear or missing in the docs? Tell us!**
-  - type: textarea
-    id: what
+        **Thanks for taking the time to help us improve our documentation!**
+        Clear docs make the project better for everyone. Please fill out the form below.
+
+  - type: input
+    id: doc-location
     attributes:
-      label: What's missing or unclear?
-      placeholder: The `ParsiDateTime` example isn't very clear...
+      label: "Affected Doc Page (URL or File Path)"
+      description: "Please provide the link to the page or the path to the file that needs improvement."
+      placeholder: "e.g., https://example.com/docs/api or /docs/getting-started.md"
     validations:
       required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "What's unclear, missing, or wrong?"
+      description: "Please describe the issue with the documentation clearly."
+      placeholder: "The `parsidateTime` example isn't very clear because it doesn't cover a key use case..."
+    validations:
+      required: true
+
   - type: textarea
     id: suggestion
     attributes:
-      label: How can we improve the documentation?
+      label: "What is your suggested improvement?"
+      description: "How can we make it better? Please provide the exact text or code examples if you can."
+      placeholder: |
+        I suggest adding this sentence: "..."
+        A more complete example would also be helpful, like so:
+        ```js
+        // Your suggested code example here
+        ```
+    validations:
+      required: true # It's better to require a suggestion.
+
   - type: checkboxes
-    id: terms
+    id: final-checks
     attributes:
-      label: Code of Conduct
+      label: "Final Checklist"
+      description: "Please verify the following before submitting."
       options:
-        - label: I agree to follow the Code of Conduct
+        - label: "I have searched the existing issues and believe this is not a duplicate."
+          required: true
+        - label: "I agree to follow this project's Code of Conduct."
           required: true

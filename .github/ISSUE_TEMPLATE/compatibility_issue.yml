@@ -7,29 +7,42 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Running into a compatibility issue with another crate or system?**
+        ## 🔄 Compatibility Issue
+
+        Thanks for reporting a compatibility issue in **parsidate**!
+        This form is for reporting problems related to integration with other crates, platforms, or environments.
+
   - type: input
     id: affected
     attributes:
       label: Affected crate/system
-      placeholder: chrono, wasm32, Windows, etc.
+      description: What other crate or environment is affected?
+      placeholder: e.g. chrono, serde, wasm32-unknown-unknown, Windows, etc.
     validations:
       required: true
+
   - type: textarea
     id: issue
     attributes:
       label: Describe the incompatibility
-      placeholder: ParsiDate doesn't compile on wasm32 because...
+      description: What exactly goes wrong? Paste errors or unexpected behavior.
+      placeholder: |
+        parsidate doesn't compile on wasm32 because it uses std::fs::File in src/utils.rs
     validations:
       required: true
+
   - type: textarea
     id: workaround
     attributes:
       label: Any known workaround?
+      description: If there's a workaround, describe it here.
+      placeholder: |
+        We can disable default features and it compiles fine under wasm32.
+
   - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
       options:
-        - label: I agree to follow the Code of Conduct
+        - label: I agree to follow the [Code of Conduct](https://github.com/parsicore/parsidate/blob/main/CODE_OF_CONDUCT.md)
           required: true

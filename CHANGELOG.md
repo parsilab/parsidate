@@ -10,7 +10,7 @@ This version introduces major new functionality for timezone handling, along wit
 
 ### ✨ Added
 
--   **Timezone Support (`timezone` feature)([#23](https://github.com/jalalvandi/ParsiDate/issues/23)):**
+-   **Timezone Support (`timezone` feature)([#23](https://github.com/parsicore/ParsiDate/issues/23)):**
     -   Introduced a new primary struct, `ZonedParsiDateTime<Tz: TimeZone>`, for handling timezone-aware date and time objects. This is available under the new `timezone` feature flag.
     -   `ZonedParsiDateTime::now(tz: Tz)`: Creates a new instance representing the current time in the specified timezone.
     -   `ZonedParsiDateTime::new(...)`: A robust constructor that correctly handles Daylight Saving Time (DST) ambiguities and non-existent times.
@@ -23,7 +23,7 @@ Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 
 ## [1.6.1] - 2025-06-04
 ### Changed
-- **Dependency Optimization([#21](https://github.com/jalalvandi/ParsiDate/issues/21)):**
+- **Dependency Optimization([#21](https://github.com/parsicore/ParsiDate/issues/21)):**
   - Lowered minimum required Rust version from 1.85 to 1.70 for broader compatibility
   - Made `serde_json` an optional dependency
   - Restructured feature flags:

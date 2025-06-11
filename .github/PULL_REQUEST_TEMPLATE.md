@@ -1,15 +1,21 @@
 ### Description
 
-(Explain what this PR does and why it’s needed.)
+<!-- Explain what this PR does and why it’s needed. Be concise but clear. -->
+
+---
 
 ### Changes
 
 - [ ] What functionality is added or changed?
 - [ ] Are any dependencies or configs updated?
 
+---
+
 ### Related Issues
 
 Closes #
+
+---
 
 ### Checklist
 
@@ -20,4 +26,4 @@ Closes #
 
 ---
 
-_Thanks for your contribution to ParsiDate! ❤️_
+_Thanks for your contribution to **parsidate**! ❤️_

@@ -1,7 +1,7 @@
-# GitHub Workflow Guide for ParsiDate Project
+# GitHub Workflow Guide for parsidate Project
 
 ## Overview
-This document describes the standard GitHub workflow to maintain a clean, manageable, and professional codebase for the ParsiDate project. Following this workflow ensures efficient collaboration, clear history, and smooth releases.
+This document describes the standard GitHub workflow to maintain a clean, manageable, and professional codebase for the parsidate project. Following this workflow ensures efficient collaboration, clear history, and smooth releases.
 
 ---
 
@@ -32,22 +32,19 @@ This document describes the standard GitHub workflow to maintain a clean, manage
 
 - Write **clear and meaningful commit messages** following [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).  
 - Commit message format:  
-<type>: <short description>
+  `<type>: <short description>`
 
-markdown
-Copy
-Edit
 - Common types:  
-- `feat`: new feature  
-- `fix`: bug fix  
-- `docs`: documentation changes  
-- `refactor`: code changes that neither fix a bug nor add a feature  
-- `test`: adding or fixing tests
+  - `feat`: new feature  
+  - `fix`: bug fix  
+  - `docs`: documentation changes  
+  - `refactor`: code changes that neither fix a bug nor add a feature  
+  - `test`: adding or fixing tests
 
 - Examples:  
-feat: add support for Persian date conversion
-fix: correct off-by-one error in date calculation
-docs: update usage examples in README
+  - feat: add support for Persian date conversion  
+  - fix: correct off-by-one error in date calculation  
+  - docs: update usage examples in README
 
 ---
 
@@ -55,7 +52,8 @@ docs: update usage examples in README
 
 - Start by creating a new **feature branch** off `main`.  
 - Make incremental commits with clear messages as you develop.  
-- Push your branch to GitHub frequently to back up work and enable collaboration.
+- Push your branch to GitHub frequently to back up work and enable collaboration.  
+- Keep your feature branch up to date by regularly rebasing it onto the latest `main` branch instead of merging, to maintain a clean history.
 
 ---
 
@@ -64,7 +62,8 @@ docs: update usage examples in README
 - Open a PR to merge your feature branch into `main` when development is complete.  
 - In the PR description, clearly explain the purpose and scope of your changes.  
 - Request at least one review from team members or yourself for code quality and correctness.  
-- Use **Squash and Merge** to keep the commit history clean and linear.
+- Use **Squash and Merge** to keep the commit history clean and linear.  
+  This compresses all your feature branch commits into a single commit on `main`, making history easy to follow.
 
 ---
 
@@ -97,13 +96,13 @@ docs: update usage examples in README
 
 ## Summary
 
-| Step                 | Action                                            |
-|----------------------|--------------------------------------------------|
-| Branching            | Create feature/bugfix/docs branch from `main`    |
-| Development          | Commit frequently with clear messages             |
-| Pull Request         | Open PR, request review, squash & merge to `main`|
-| Issue Management     | Track work with Issues, assign Milestones/Labels |
-| Release              | Tag version, write release notes                   |
+| Step            | Action                                            |
+|-----------------|--------------------------------------------------|
+| Branching       | Create feature/bugfix/docs branch from `main`    |
+| Development     | Commit frequently with clear messages             |
+| Pull Request    | Open PR, request review, squash & merge to `main`|
+| Issue Management| Track work with Issues, assign Milestones/Labels  |
+| Release         | Tag version, write release notes                   |
 
 ---
 

@@ -1,6 +1,6 @@
 // ~/src/datetime.rs
 //
-//  * Copyright (C) Mohammad (Sina) Jalalvandi 2024-2025 <jalalvandi.sina@gmail.com>
+//  * Copyright (C) ParsiCore (parsidate) 2024-2025 <parsicore.dev@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
 //  * Version : 1.7.0
