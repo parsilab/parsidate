@@ -7,11 +7,61 @@
 //  * URL     : https://github.com/parsicore/parsidate
 //  * Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 //
-//! Defines a timezone-aware Parsi date and time object.
+//! Defines a timezone-aware Jalali (Parsi) date and time.
 //!
-//! This module provides the `ZonedParsiDateTime` struct, which represents a specific
-//! moment in time within a given timezone. It is a feature-gated module,
-//! available only when the `timezone` feature is enabled.
+//! This module is available when the **`timezone`** feature is enabled.
+//! It provides the [`ZonedParsiDateTime`] struct, which is essential for representing
+//! an exact moment in time in the Persian calendar, associated with a specific timezone.
+//!
+//! # Overview
+//!
+//! In programming, it's crucial to distinguish between:
+//! 1.  **Naive Time**: A "wall-clock" time without timezone information (e.g., "14:30").
+//!     This is ambiguous; "14:30" can mean different things in Tehran, London, or New York.
+//!     [`ParsiDateTime`](crate::ParsiDateTime) represents this.
+//! 2.  **Aware Time**: An exact, unambiguous instant in time (e.g., "December 31st, 1403 at
+//!     14:30 in Asia/Tehran"). This corresponds to a single point on the global timeline.
+//!
+//! [`ZonedParsiDateTime`] represents this aware time. It is a robust wrapper around
+//! `chrono::DateTime<Tz>` and is the recommended type for any application that
+//! needs to handle dates and times across different regions, store timestamps, or perform
+//! timezone-sensitive calculations. It correctly handles complex scenarios like
+//! Daylight Saving Time (DST).
+//!
+//! # Usage
+//!
+//! To use `ZonedParsiDateTime`, you need a `TimeZone` provider. The most common choice
+//! in the Rust ecosystem is the `chrono-tz` crate.
+//!
+//! First, add `parsidate` with the `timezone` feature and `chrono-tz` to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! parsidate = { version = "1.7.0", features = ["timezone"] }
+//! chrono-tz = "0.8"
+//! ```
+//!
+//! Then, you can create instances of `ZonedParsiDateTime`:
+//!
+//! ```
+//! # #[cfg(feature = "timezone")] {
+//! use parsidate::ZonedParsiDateTime;
+//! use chrono_tz::Asia::Tehran;
+//! use chrono_tz::America::New_York;
+//!
+//! // Create a specific moment in time in the Tehran timezone.
+//! let pdt_tehran = ZonedParsiDateTime::new(1403, 9, 21, 12, 0, 0, Tehran).unwrap();
+//!
+//! // Convert this exact moment to the New York timezone.
+//! let pdt_new_york = pdt_tehran.with_timezone(&New_York);
+//!
+//! println!("Tehran Time: {}", pdt_tehran);      // Outputs: 1403/09/21 12:00:00 +0330
+//! println!("New York Time: {}", pdt_new_york);  // Outputs: 1403/09/21 03:30:00 -0500
+//!
+//! // Despite having different local times, they represent the same instant.
+//! assert_eq!(pdt_tehran, pdt_new_york);
+//! # }
+//! ```
 
 use crate::{DateError, ParsiDate, ParsiDateTime};
 use chrono::{DateTime, Duration, TimeZone};
@@ -19,34 +69,46 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::ops::{Add, Sub};
 
-/// Represents a specific date and time in the Persian (Jalali) calendar
-/// within a specific timezone.
+/// Represents a timezone-aware date and time in the Persian (Jalali) calendar.
 ///
-/// This struct is the timezone-aware counterpart to [`ParsiDateTime`]. It handles
-/// complexities like Daylight Saving Time (DST) and UTC offsets by wrapping a
-/// `chrono::DateTime<Tz>`. It unambiguously represents a single, absolute moment
-/// in time and is the recommended type for all timezone-sensitive operations.
+/// `ZonedParsiDateTime<Tz>` is a high-level wrapper around `chrono::DateTime<Tz>`,
+/// providing a calendar-aware API for an unambiguous moment in time. It is the
+/// timezone-aware counterpart to [`ParsiDateTime`].
 ///
-/// This struct is only available when the `timezone` feature is enabled.
-/// To use it, you'll also need a `chrono::TimeZone` implementation, typically
-/// from the `chrono-tz` crate.
+/// This struct is the preferred way to handle time when correctness across different
+/// geographical locations is required. It accounts for UTC offsets and Daylight
+/// Saving Time (DST) rules automatically, ensuring that operations are accurate.
+///
+/// An instance of `ZonedParsiDateTime<Tz>` contains both the Jalali date and time
+/// components and the specific `TimeZone` (`Tz`) it belongs to.
+///
+/// This struct is only available if the `timezone` feature is enabled. You will typically
+/// use it with a `TimeZone` implementation from a crate like `chrono-tz`.
 ///
 /// # Examples
+///
+/// Creating a new `ZonedParsiDateTime`:
 ///
 /// ```
 /// # #[cfg(feature = "timezone")] {
 /// use parsidate::ZonedParsiDateTime;
 /// use chrono_tz::Asia::Tehran;
 ///
+/// // Create a ZonedParsiDateTime for November 5, 1403, at 2:30 PM in Tehran.
 /// let tehran_time = ZonedParsiDateTime::new(1403, 8, 15, 14, 30, 0, Tehran).unwrap();
+///
+/// assert_eq!(tehran_time.year(), 1403);
+/// assert_eq!(tehran_time.month(), 8);
+/// assert_eq!(tehran_time.day(), 15);
 /// assert_eq!(tehran_time.hour(), 14);
 /// assert_eq!(tehran_time.timezone(), Tehran);
 /// # }
 /// ```
 #[derive(Clone)]
 pub struct ZonedParsiDateTime<Tz: TimeZone> {
-    /// The underlying `chrono::DateTime` object, which serves as the source of truth
-    /// for all time-related calculations.
+    /// The underlying `chrono::DateTime` object.
+    /// This serves as the single source of truth for the absolute instant in time.
+    /// All Jalali calendar calculations are derived from this value.
     inner: DateTime<Tz>,
 }
 
@@ -55,15 +117,20 @@ pub struct ZonedParsiDateTime<Tz: TimeZone> {
 impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// Creates a new `ZonedParsiDateTime` from an existing `chrono::DateTime`.
     ///
-    /// This is the primary internal constructor and is not intended for public use.
+    /// This is an internal constructor used by other methods within the library.
+    #[inline]
     fn from_chrono_datetime(dt: DateTime<Tz>) -> Self {
         Self { inner: dt }
     }
 
     /// Returns the current date and time in the specified timezone.
     ///
-    /// This method gets the current system time (as a UTC timestamp) and converts
-    /// it to the desired timezone.
+    /// This function retrieves the current system time (as a UTC timestamp) and
+    /// converts it to the requested timezone `tz`.
+    ///
+    /// # Note
+    /// This relies on the system's clock. It can panic if the system time is earlier
+    /// than the Unix epoch (1970-01-01 00:00:00 UTC).
     ///
     /// # Example
     ///
@@ -72,41 +139,57 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// # use parsidate::ZonedParsiDateTime;
     /// # use chrono_tz::Asia::Tehran;
     /// # use chrono_tz::America::New_York;
+    /// # use chrono::Duration;
+    ///
+    /// // Get the current time in two different timezones.
     /// let now_in_tehran = ZonedParsiDateTime::now(Tehran);
     /// println!("Current time in Tehran: {}", now_in_tehran);
     ///
     /// let now_in_new_york = ZonedParsiDateTime::now(New_York);
     /// println!("Current time in New York: {}", now_in_new_york);
     ///
-    /// // Both represent the same instant in time.
-    /// assert_eq!(now_in_tehran.clone() - now_in_new_york.clone(), Duration::zero());
+    /// // Although their wall-clock times are different, they represent the same
+    /// // absolute instant. Their difference should be zero.
+    /// assert!((now_in_tehran - now_in_new_york).num_seconds() == 0);
     /// # }
     /// ```
     #[must_use]
     pub fn now(tz: Tz) -> Self {
+        // Get the current UTC time from the system.
         let utc_now = chrono::Utc::now();
+        // Convert the UTC time to the specified timezone.
         Self {
             inner: utc_now.with_timezone(&tz),
         }
     }
 
-    /// Creates a `ZonedParsiDateTime` from Persian date and time components in a specific timezone.
+    /// Creates a `ZonedParsiDateTime` from Jalali date and time components in a given timezone.
     ///
-    /// This method performs full validation of the date and time components and correctly
-    /// handles ambiguities and non-existent times that can occur during Daylight Saving Time (DST)
-    /// transitions.
+    /// This is the primary constructor for creating a specific, timezone-aware datetime.
+    /// It performs a full validation of the date and time components and correctly handles
+    /// Daylight Saving Time (DST) transitions, where a local time might be ambiguous or
+    /// non-existent.
     ///
-    /// - If the local time is **ambiguous** (e.g., during a "fall back" when clocks are set back),
-    ///   the earlier of the two possible instances is chosen by default.
-    /// - If the local time is **non-existent** (e.g., during a "spring forward" when clocks jump),
-    ///   an `Err(DateError::InvalidTime)` is returned.
+    /// The process is as follows:
+    /// 1. The Jalali date/time is converted to a naive Gregorian `DateTime`.
+    /// 2. The `TimeZone` provider attempts to resolve this naive local time.
+    ///
+    /// ## Timezone Resolution
+    ///
+    /// - **Unique Time**: If the local time exists and is unambiguous, a `ZonedParsiDateTime` is returned.
+    /// - **Ambiguous Time**: During a "fall back" (e.g., when DST ends), a local time may occur twice.
+    ///   This function resolves the ambiguity by choosing the *earlier* of the two possible instances.
+    /// - **Non-existent Time**: During a "spring forward" (e.g., when DST begins), a gap in local time
+    ///   is created. If the provided time falls within this gap, it is considered invalid.
     ///
     /// # Errors
     ///
-    /// Returns `Err` if:
-    /// - The components do not form a valid Parsi date (`DateError::InvalidDate`).
-    /// - The components do not form a valid time (`DateError::InvalidTime`).
-    /// - The resulting local time does not exist in the specified timezone (`DateError::InvalidTime`).
+    /// This function will return an `Err` in the following cases:
+    /// - [`DateError::InvalidDate`]: If the year, month, or day do not form a valid Jalali date
+    ///   (e.g., `1403-12-31` in a non-leap year).
+    /// - [`DateError::InvalidTime`]: If the hour, minute, or second are out of their valid ranges.
+    /// - [`DateError::InvalidTime`]: If the specified local time does not exist in the given
+    ///   timezone due to a DST transition (a "spring forward" gap).
     ///
     /// # Examples
     ///
@@ -116,16 +199,17 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// # use chrono_tz::Asia::Tehran;
     /// # use chrono_tz::America::New_York;
     ///
-    /// // A valid time in Tehran
+    /// // 1. A valid, unambiguous time in Tehran.
     /// let dt = ZonedParsiDateTime::new(1403, 10, 1, 12, 0, 0, Tehran);
     /// assert!(dt.is_ok());
     ///
-    /// // An invalid date component
+    /// // 2. An invalid date component (1404 is not a leap year, so Esfand has 29 days).
     /// let invalid_date = ZonedParsiDateTime::new(1404, 12, 30, 10, 0, 0, Tehran);
     /// assert_eq!(invalid_date, Err(DateError::InvalidDate));
     ///
-    /// // A non-existent time during a DST spring-forward in New York
-    /// // On 2024-03-10 (1402-12-20), 2:30 AM did not exist.
+    /// // 3. A non-existent time in New York due to a DST spring-forward.
+    /// // In 2024, clocks jumped from 1:59:59 AM to 3:00:00 AM on March 10th.
+    /// // The Jalali date for this event is 1402/12/20.
     /// let non_existent_time = ZonedParsiDateTime::new(1402, 12, 20, 2, 30, 0, New_York);
     /// assert_eq!(non_existent_time, Err(DateError::InvalidTime));
     /// # }
@@ -139,20 +223,30 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
         second: u32,
         tz: Tz,
     ) -> Result<Self, DateError> {
+        // First, create a naive ParsiDateTime to validate components.
         let pdt = ParsiDateTime::new(year, month, day, hour, minute, second)?;
+        // Convert the naive ParsiDateTime to its equivalent naive Gregorian DateTime.
         let naive_gregorian = pdt.to_gregorian()?;
+
+        // Use chrono's TimeZone trait to resolve the local time. This correctly
+        // handles DST ambiguities and non-existent times.
         match tz.from_local_datetime(&naive_gregorian) {
+            // The local time is valid and unique.
             chrono::LocalResult::Single(dt) => Ok(Self::from_chrono_datetime(dt)),
+            // The local time is ambiguous (occurs twice, e.g., DST end).
+            // We follow chrono's convention and choose the earlier instance.
             chrono::LocalResult::Ambiguous(dt1, _dt2) => Ok(Self::from_chrono_datetime(dt1)),
+            // The local time does not exist (e.g., during DST start).
             chrono::LocalResult::None => Err(DateError::InvalidTime),
         }
     }
 
     // --- Accessors ---
 
-    /// Returns the naive [`ParsiDate`] component of this zoned datetime.
+    /// Returns the naive [`ParsiDate`] (local date) component of this datetime.
     ///
-    /// This represents the local date in the object's timezone.
+    /// This represents the date on the "wall clock" in the object's timezone,
+    /// without any timezone information attached.
     ///
     /// # Example
     ///
@@ -169,7 +263,10 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
         self.datetime().date()
     }
 
-    /// Returns the naive [`ParsiDateTime`] (local time) component of this zoned datetime.
+    /// Returns the naive [`ParsiDateTime`] (local datetime) component of this datetime.
+    ///
+    /// This represents the full date and time on the "wall clock" in the object's
+    /// timezone, stripped of its timezone context.
     ///
     /// # Example
     ///
@@ -184,46 +281,55 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// ```
     #[must_use]
     pub fn datetime(&self) -> ParsiDateTime {
+        // Convert the inner chrono::DateTime's naive local time to a ParsiDateTime.
+        // This unwrap is safe because a valid ZonedParsiDateTime always corresponds
+        // to a valid Gregorian date, which in turn can be converted to Parsi.
         ParsiDateTime::from_gregorian(self.inner.naive_local()).unwrap()
     }
 
-    /// Returns the year component of the Persian date.
+    /// Returns the year component of the local Persian date.
     #[must_use]
+    #[inline]
     pub fn year(&self) -> i32 {
-        self.date().year()
+        self.datetime().year()
     }
 
-    /// Returns the month component of the Persian date (1-12).
+    /// Returns the month component of the local Persian date (1-12).
     #[must_use]
+    #[inline]
     pub fn month(&self) -> u32 {
-        self.date().month()
+        self.datetime().month()
     }
 
-    /// Returns the day component of the Persian date (1-31).
+    /// Returns the day of the month component of the local Persian date (1-31).
     #[must_use]
+    #[inline]
     pub fn day(&self) -> u32 {
-        self.date().day()
+        self.datetime().day()
     }
 
     /// Returns the hour component of the local time (0-23).
     #[must_use]
+    #[inline]
     pub fn hour(&self) -> u32 {
         self.datetime().hour()
     }
 
     /// Returns the minute component of the local time (0-59).
     #[must_use]
+    #[inline]
     pub fn minute(&self) -> u32 {
         self.datetime().minute()
     }
 
     /// Returns the second component of the local time (0-59).
     #[must_use]
+    #[inline]
     pub fn second(&self) -> u32 {
         self.datetime().second()
     }
 
-    /// Returns the timezone associated with this `ZonedParsiDateTime`.
+    /// Returns a copy of the timezone associated with this `ZonedParsiDateTime`.
     ///
     /// # Example
     ///
@@ -242,23 +348,26 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
 
     /// Returns the UTC offset for this specific date and time.
     ///
-    /// The offset can vary for the same timezone depending on the date
-    /// (e.g., due to Daylight Saving Time).
+    /// The offset represents the duration between the local time and UTC.
+    /// Its value can vary for the same timezone depending on the date due to rules
+    /// like Daylight Saving Time.
     ///
     /// # Example
     ///
+    /// New York's UTC offset changes between summer and winter.
     /// ```
     /// # #[cfg(feature = "timezone")] {
     /// # use parsidate::ZonedParsiDateTime;
     /// # use chrono_tz::America::New_York;
-    /// # use chrono::Offset; // Trait needed for .fix()
-    /// // In summer (DST), New York is UTC-4.
-    /// let summer_time = ZonedParsiDateTime::new(1403, 4, 1, 10, 0, 0, New_York).unwrap();
-    /// assert_eq!(summer_time.offset().fix().local_minus_utc(), -4 * 3600);
+    /// # use chrono::Offset; // Trait needed for `fix()`
     ///
-    /// // In winter (standard time), New York is UTC-5.
+    /// // In summer (DST), New York is UTC-4. Jalali month 4 is Tir.
+    /// let summer_time = ZonedParsiDateTime::new(1403, 4, 1, 10, 0, 0, New_York).unwrap();
+    /// assert_eq!(summer_time.offset().fix().local_minus_utc(), -4 * 3600); // -14400 seconds
+    ///
+    /// // In winter (standard time), New York is UTC-5. Jalali month 10 is Dey.
     /// let winter_time = ZonedParsiDateTime::new(1403, 10, 1, 10, 0, 0, New_York).unwrap();
-    /// assert_eq!(winter_time.offset().fix().local_minus_utc(), -5 * 3600);
+    /// assert_eq!(winter_time.offset().fix().local_minus_utc(), -5 * 3600); // -18000 seconds
     /// # }
     /// ```
     #[must_use]
@@ -266,10 +375,11 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
         self.inner.offset().clone()
     }
 
-    /// Changes the timezone of this `ZonedParsiDateTime`.
+    /// Changes the timezone of this datetime.
     ///
-    /// This operation preserves the absolute instant in time but may change the
-    /// local date and time components to reflect the new timezone.
+    /// This method converts the datetime to a different timezone while preserving the
+    /// absolute instant in time. The local ("wall-clock") date and time components
+    /// will be adjusted to reflect the new timezone.
     ///
     /// # Example
     ///
@@ -278,17 +388,18 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// # use parsidate::{ParsiDate, ZonedParsiDateTime};
     /// # use chrono_tz::Asia::Tehran;
     /// # use chrono_tz::Europe::London;
-    /// // 2:00 AM in Tehran on Dey 10th.
+    ///
+    /// // An event at 2:00 AM in Tehran on Dey 10th.
     /// let dt_tehran = ZonedParsiDateTime::new(1402, 10, 10, 2, 0, 0, Tehran).unwrap();
     ///
-    /// // Convert to London time.
+    /// // Find out what time it was in London at that same moment.
     /// let dt_london = dt_tehran.with_timezone(&London);
     ///
-    /// // Tehran (UTC+3:30) is 3.5 hours ahead of London (UTC+0) in winter.
+    /// // In winter, Tehran (UTC+3:30) is 3.5 hours ahead of London (UTC+0).
     /// // So, 2:00 AM in Tehran is 10:30 PM the *previous day* in London.
+    /// assert_eq!(dt_london.date(), ParsiDate::new(1402, 10, 9).unwrap());
     /// assert_eq!(dt_london.hour(), 22);
     /// assert_eq!(dt_london.minute(), 30);
-    /// assert_eq!(dt_london.date(), ParsiDate::new(1402, 10, 9).unwrap());
     /// # }
     /// ```
     #[must_use]
@@ -300,7 +411,9 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
 
     // --- Arithmetic ---
 
-    /// Adds a `chrono::Duration` to this `ZonedParsiDateTime`, returning a new instance.
+    /// Adds a `chrono::Duration` to this datetime, returning a new instance.
+    ///
+    /// This is a convenience method. For more idiomatic code, use the `+` operator.
     ///
     /// # Example
     ///
@@ -309,11 +422,13 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// # use parsidate::ZonedParsiDateTime;
     /// # use chrono::Duration;
     /// # use chrono_tz::Asia::Tehran;
-    /// let dt = ZonedParsiDateTime::new(1403, 1, 1, 23, 0, 0, Tehran).unwrap();
-    /// let two_hours_later = dt.add_duration(Duration::hours(2));
     ///
-    /// assert_eq!(two_hours_later.date(), dt.date().add_days(1).unwrap());
-    /// assert_eq!(two_hours_later.hour(), 1);
+    /// let dt = ZonedParsiDateTime::new(1403, 1, 1, 23, 0, 0, Tehran).unwrap();
+    /// let later = dt.add_duration(Duration::hours(2)); // Same as `dt + Duration::hours(2)`
+    ///
+    /// // Adding 2 hours crosses into the next day.
+    /// assert_eq!(later.date(), dt.date().with_day(2).unwrap());
+    /// assert_eq!(later.hour(), 1);
     /// # }
     /// ```
     #[must_use]
@@ -323,7 +438,9 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
         }
     }
 
-    /// Subtracts a `chrono::Duration` from this `ZonedParsiDateTime`, returning a new instance.
+    /// Subtracts a `chrono::Duration` from this datetime, returning a new instance.
+    ///
+    /// This is a convenience method. For more idiomatic code, use the `-` operator.
     ///
     /// # Example
     ///
@@ -332,11 +449,13 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
     /// # use parsidate::ZonedParsiDateTime;
     /// # use chrono::Duration;
     /// # use chrono_tz::Asia::Tehran;
-    /// let dt = ZonedParsiDateTime::new(1403, 1, 1, 1, 0, 0, Tehran).unwrap();
-    /// let two_hours_earlier = dt.sub_duration(Duration::hours(2));
     ///
-    /// assert_eq!(two_hours_earlier.date(), dt.date().add_days(-1).unwrap());
-    /// assert_eq!(two_hours_earlier.hour(), 23);
+    /// let dt = ZonedParsiDateTime::new(1403, 1, 1, 1, 0, 0, Tehran).unwrap();
+    /// let earlier = dt.sub_duration(Duration::hours(2)); // Same as `dt - Duration::hours(2)`
+    ///
+    /// // Subtracting 2 hours crosses into the previous day.
+    /// assert_eq!(earlier.date(), dt.date().with_year(1402).unwrap().with_month(12).unwrap().with_day(29).unwrap());
+    /// assert_eq!(earlier.hour(), 23);
     /// # }
     /// ```
     #[must_use]
@@ -351,27 +470,35 @@ impl<Tz: TimeZone> ZonedParsiDateTime<Tz> {
 
 /// Compares two `ZonedParsiDateTime` instances for equality.
 ///
-/// Two instances are equal if they represent the exact same moment in time,
-/// regardless of their timezone.
+/// Two instances are considered equal if they represent the exact same moment in
+/// universal time, regardless of their timezone.
+///
+/// For example, `1403-01-01 12:00:00` in `Asia/Tehran` is **not equal** to
+/// `1403-01-01 12:00:00` in `Europe/London`, but it **is equal** to
+/// `1403-01-01 08:30:00` in `Europe/London`.
 impl<Tz: TimeZone> PartialEq for ZonedParsiDateTime<Tz> {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
     }
 }
 
-/// Implements the `Eq` trait, allowing for hashing and other equality-based operations.
+/// Implements the `Eq` trait, allowing `ZonedParsiDateTime` to be used in
+/// collections that require total equality, like `HashMap`.
 impl<Tz: TimeZone> Eq for ZonedParsiDateTime<Tz> where DateTime<Tz>: Eq {}
 
-/// Partially compares two `ZonedParsiDateTime` instances.
+/// Provides partial ordering for `ZonedParsiDateTime`.
 ///
-/// The comparison is based on the absolute instant in time.
+/// The comparison is performed on the absolute instant in time, not on the
+/// local "wall-clock" time.
 impl<Tz: TimeZone> PartialOrd for ZonedParsiDateTime<Tz> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-/// Totally compares two `ZonedParsiDateTime` instances.
+/// Provides total ordering for `ZonedParsiDateTime`.
+///
+/// Like `PartialEq`, the comparison is based on the absolute instant in time.
 impl<Tz: TimeZone> Ord for ZonedParsiDateTime<Tz>
 where
     DateTime<Tz>: Ord,
@@ -381,18 +508,23 @@ where
     }
 }
 
-/// Adds a `chrono::Duration` using the `+` operator.
+/// Adds a `chrono::Duration` to a `ZonedParsiDateTime` using the `+` operator.
+///
+/// This operation performs exact time arithmetic, correctly handling DST and
+/// timezone transitions.
 impl<Tz: TimeZone> Add<Duration> for ZonedParsiDateTime<Tz> {
     type Output = Self;
     fn add(self, rhs: Duration) -> Self::Output {
-        // This moves `self`, which is standard for operator implementations.
+        // This moves `self`, which is the standard convention for operator implementations.
         Self {
             inner: self.inner + rhs,
         }
     }
 }
 
-/// Subtracts a `chrono::Duration` using the `-` operator.
+/// Subtracts a `chrono::Duration` from a `ZonedParsiDateTime` using the `-` operator.
+///
+/// This operation performs exact time arithmetic.
 impl<Tz: TimeZone> Sub<Duration> for ZonedParsiDateTime<Tz> {
     type Output = Self;
     fn sub(self, rhs: Duration) -> Self::Output {
@@ -404,6 +536,9 @@ impl<Tz: TimeZone> Sub<Duration> for ZonedParsiDateTime<Tz> {
 }
 
 /// Calculates the `chrono::Duration` between two `ZonedParsiDateTime` instances.
+///
+/// This operation returns the exact duration of time that has elapsed between
+/// two moments, regardless of their timezones.
 impl<Tz: TimeZone, OtherTz: TimeZone> Sub<ZonedParsiDateTime<OtherTz>> for ZonedParsiDateTime<Tz> {
     type Output = Duration;
     fn sub(self, rhs: ZonedParsiDateTime<OtherTz>) -> Self::Output {
@@ -413,8 +548,19 @@ impl<Tz: TimeZone, OtherTz: TimeZone> Sub<ZonedParsiDateTime<OtherTz>> for Zoned
 
 /// Formats the `ZonedParsiDateTime` for display.
 ///
-/// The default format is `YYYY/MM/DD HH:MM:SS OFFSET`, for example,
-/// `1403/08/15 14:30:00 +0330`.
+/// The default format is `YYYY/MM/DD HH:MM:SS OFFSET`, which combines the local Parsi
+/// datetime with its UTC offset.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(feature = "timezone")] {
+/// # use parsidate::ZonedParsiDateTime;
+/// # use chrono_tz::Asia::Tehran;
+/// let dt = ZonedParsiDateTime::new(1403, 8, 15, 14, 30, 0, Tehran).unwrap();
+/// assert_eq!(dt.to_string(), "1403/08/15 14:30:00 +0330");
+/// # }
+/// ```
 impl<Tz: TimeZone> fmt::Display for ZonedParsiDateTime<Tz>
 where
     Tz::Offset: fmt::Display,
@@ -427,8 +573,25 @@ where
 }
 
 /// Formats the `ZonedParsiDateTime` for debugging.
+///
+/// The debug format provides a more detailed, developer-friendly representation
+/// of the struct's contents, including the local Parsi datetime and the timezone name.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(feature = "timezone")] {
+/// # use parsidate::ZonedParsiDateTime;
+/// # use chrono_tz::Asia::Tehran;
+/// let dt = ZonedParsiDateTime::new(1403, 8, 15, 9, 5, 0, Tehran).unwrap();
+/// let debug_str = format!("{:?}", dt);
+/// assert!(debug_str.contains("datetime: ParsiDateTime(1403/08/15 09:05:00)"));
+/// assert!(debug_str.contains("timezone: Asia/Tehran"));
+/// # }
+/// ```
 impl<Tz: TimeZone> fmt::Debug for ZonedParsiDateTime<Tz>
 where
+    // The timezone type itself must be printable for debugging.
     Tz: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
