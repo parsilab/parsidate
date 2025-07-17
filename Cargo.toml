@@ -5,13 +5,13 @@
 
 [package]
 name = "parsidate" 
-version = "1.7.0"
+version = "1.7.1"
 edition = "2021"
 description = "A comprehensive library for working with the Persian (Jalali/Shamsi) calendar system in Rust."
 license = "Apache-2.0" 
 authors = ["parsicore <parsicore.dev@gmail.com>"] 
 homepage = "https://crates.io/crates/parsidate"
-repository = "https://github.com/parsicore/ParsiDate"
+repository = "https://github.com/parsicore/parsidate"
 readme = "README.md"
 documentation = "https://docs.rs/parsidate/"
 keywords = ["date", "jalali", "calendar", "persian", "shamsi"] 

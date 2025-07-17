@@ -36,7 +36,7 @@ Add `parsidate` to your `Cargo.toml`. You can enable features based on your need
 
 ```toml
 [dependencies]
-parsidate = "1.7.0"
+parsidate = "1.7.1"
 # Add other dependencies as needed
 chrono = "0.4"
 ```
@@ -51,13 +51,13 @@ To enable specific features:
 ```toml
 [dependencies]
 # Example: Enable both serde and timezone support
-parsidate = { version = "1.7.0", features = ["serde", "timezone"] }
+parsidate = { version = "1.7.1", features = ["serde", "timezone"] }
 
 # For timezone support, you also need chrono-tz
 chrono-tz = "0.8"
 ```
 
-The `full` feature enables all available features: `parsidate = { version = "1.7.0", features = ["full"] }`.
+The `full` feature enables all available features: `parsidate = { version = "1.7.1", features = ["full"] }`.
 
 ### 🚀 Usage Examples
 
@@ -187,6 +187,6 @@ Contributions (bug reports, feature requests, pull requests) are welcome! Please
 
 Licensed under the [Apache License, Version 2.0](./LICENSE).
 ```
-Version:1.7.0
+Version:1.7.1
 Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 ```
