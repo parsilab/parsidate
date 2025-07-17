@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-07-17
+
+This is a quality-of-life release focused exclusively on improving documentation. There are no breaking changes or modifications to the library's logic. It is fully backward-compatible with version 1.7.0.
+
+### Changed
+
+-   **Complete Documentation Overhaul**: All public-facing doc comments for `ParsiDate`, `ParsiDateTime`, `ZonedParsiDateTime`, `Season`, and error types have been rewritten to be more comprehensive, clear, and idiomatic according to Rustdoc standards.
+-   **Enhanced Examples**: Expanded and clarified code examples for all public functions, covering more use cases, edge cases, and error conditions.
+-   **Improved Explanations**: Clarified the internal logic and user-facing behavior for complex topics, including Gregorian conversion, `unsafe` constructors, arithmetic day-clamping, and timezone-aware operations.
+
+### Added
+
+-   **Comprehensive Module-Level Docs**: Added detailed documentation to each file (`lib.rs`, `date.rs`, `datetime.rs`, `zoned.rs`, etc.) to explain the purpose and structure of each module.
+-   **Feature Flag Guidance**: Added explicit instructions and examples in the main library documentation (`lib.rs`) on how to enable and use the `serde` and `timezone` crate features.
+-   **Standardized Doc Headers**: Added standard copyright and metadata headers to all source files for consistency.
+
+### Fixed
+
+-   **Documentation Consistency**: Ensured a consistent level of detail and formatting across all parts of the public API documentation.
+-   **Clarity on Error Types**: Improved the documentation for `DateError` and `ParseErrorKind` to make the cause of potential failures more understandable.
+
+Sign: no change
+
+
+
 ## [1.7.0] - 2025-06-07
 This version introduces major new functionality for timezone handling, along with several improvements and fixes to the existing API.
 

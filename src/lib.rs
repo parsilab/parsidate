@@ -3,45 +3,99 @@
 //  * Copyright (C) ParsiCore (parsidate) 2024-2025 <parsicore.dev@gmail.com>
 //  * Package : parsidate
 //  * License : Apache-2.0
-//  * Version : 1.7.0
+//  * Version : 1.7.1
 //  * URL     : https://github.com/parsicore/parsidate
 //  * Sign: parsidate-20250607-fea13e856dcd-459c6e73c83e49e10162ee28b26ac7cd
 //
-//! # ParsiDate: Comprehensive Persian (Jalali) Calendar Implementation in Rust
-
-//! This crate provides comprehensive functionality for working with the Persian (Jalali or Shamsi) calendar system.
-//! It allows for:
+//! # ParsiDate: A Comprehensive Persian (Jalali) Calendar Library for Rust
 //!
-//! *   **Conversion:** Seamlessly convert dates and date-times between the Gregorian and Persian calendars.
-//! *   **Validation:** Check if a given year, month, day and date-times combination forms a valid Persian date.
-//! *   **Formatting:** Display Persian dates and times in various predefined formats ("short", "long", "iso") and using custom `strftime`-like patterns.
-//! *   **Parsing:** Parse strings into `ParsiDate` or `ParsiDateTime` objects based on specified formats.
-//! *   **Date Arithmetic:** Add or subtract days, months, and years from a date.
-//! *   **Leap Year Calculation:** Determine if a Persian or Gregorian year is a leap year (using a common 33-year cycle approximation for Persian).
-//! *   **Weekday Calculation:** Find the Persian name for the day of the week.
-//! *   **Ordinal Day Calculation:** Get the day number within the year (1-366).
-//! *   **Helper Functions:** Easily get the first/last day of the month/year or manipulate date/time components.
-//! *   **Current Date:** Get the current system date as a `ParsiDate`.
-//! *   **Week of Year:** Calculate the week number within the Persian year (Saturday start).
-//! *   **Seasons:** Get the current season based on the Persian date.
-//! *   **Timezone Support:** Create timezone-aware datetimes and perform conversions between timezones (requires the `timezone` feature).
-//! *   **Serde Support:** Optional serialization/deserialization using the `serde` feature.
+//! `parsidate` offers a powerful, ergonomic, and comprehensive suite of tools for working with the
+//! Persian (also known as Jalali or Shamsi) calendar in Rust. Built on top of `chrono`, it provides
+//! a familiar and robust API for date and time manipulations, conversions, and formatting.
 //!
-//! It relies on the `chrono` crate for underlying Gregorian date representations, current time, and some calculations.
+//! The library's core types are:
+//! - [`ParsiDate`]: Represents a date (year, month, day) in the Persian calendar.
+//! - [`ParsiDateTime`]: Represents a specific date and time, without timezone information.
+//! - [`ZonedParsiDateTime`]: A timezone-aware date and time (requires the `timezone` feature).
+//!
+//! ## Key Features
+//!
+//! *   **Seamless Gregorian Conversion**: Effortlessly convert between Persian and Gregorian (`chrono`) types.
+//! *   **Robust Validation**: Ensure date and time integrity with strict validation rules.
+//! *   **Flexible Formatting & Parsing**: Use `strftime`-like patterns for custom string representations.
+//! *   **Full-Featured Arithmetic**: Reliably perform calculations with days, months, years, and `chrono::Duration`.
+//! *   **Rich Date Information**: Access properties like weekday, ordinal day, and leap year status.
+//! *   **Season Calculation**: Determine the Persian season (`Bahar`, `Tabestan`, etc.) for any date.
+//! *   **Timezone Aware (Optional)**: Full support for timezones via the `timezone` feature.
+//! *   **Serialization (Optional)**: `serde` support for easy integration with data formats like JSON.
+//!
+//! ## Getting Started
+//!
+//! Add `parsidate` to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! parsidate = "1.7.1"
+//! # For timezone and/or serde support, enable features:
+//! # parsidate = { version = "1.7.1", features = ["timezone", "serde"] }
+//! ```
+//!
+//! A quick example of creating a date, formatting it, and getting its season:
+//!
+//! ```rust
+//! use parsidate::{ParsiDate, ParsiDateTime, Season};
+//! use chrono::NaiveDate;
+//!
+//! fn main() -> Result<(), parsidate::DateError> {
+//!     // Create a ParsiDate for a summer day
+//!     let pd = ParsiDate::new(1403, 5, 2)?;
+//!
+//!     // Format it
+//!     println!("Formatted date: {}", pd.format("%A، %d %B %Y"));
+//!
+//!     // Get its season
+//!     assert_eq!(pd.season()?, Season::Tabestan);
+//!     println!("The season is: {}", pd.season()?.name_persian()); // "تابستان"
+//!
+//!     // Convert it to Gregorian
+//!     let gregorian_date = pd.to_gregorian()?;
+//!     assert_eq!(gregorian_date, NaiveDate::from_ymd_opt(2024, 7, 23).unwrap());
+//!     println!("Equivalent Gregorian date: {}", gregorian_date);
+//!
+//!     Ok(())
+//! }
+//! ```
 //!
 //! ## Examples
 //!
+//! A more detailed look at the library's capabilities.
+//!
 //! ```rust
 //! use chrono::{NaiveDate, NaiveDateTime, Duration};
-//! use parsidate::{ParsiDate, ParsiDateTime, DateError,Season}; // Import both
+//! use parsidate::{ParsiDate, ParsiDateTime, DateError, Season};
 //!
-//! // --- ParsiDate Usage (Date only) ---
+//! // --- ParsiDate (Date only) ---
 //! let pd = ParsiDate::new(1403, 5, 2).unwrap();
 //! assert_eq!(pd.format("%Y-%m-%d"), "1403-05-02");
+//!
+//! // Get today's date
 //! let today_date = ParsiDate::today().unwrap();
 //! println!("Today's Persian date: {}", today_date);
 //!
-//! // --- ParsiDateTime Usage (Date and Time) ---
+//! // Get date properties
+//! assert_eq!(pd.weekday(), Ok("سه‌شنبه".to_string()));
+//! assert_eq!(pd.ordinal(), Ok(126));
+//! assert_eq!(pd.week_of_year(), Ok(19));
+//! assert!(!ParsiDate::is_persian_leap_year(1404));
+//!
+//! // --- Season Usage ---
+//! let autumn_date = ParsiDate::new(1403, 8, 15).unwrap();
+//! let season = autumn_date.season().unwrap();
+//! assert_eq!(season, Season::Paeez);
+//! assert_eq!(season.name_persian(), "پاییز");
+//! assert_eq!(season.name_english(), "Autumn");
+//!
+//! // --- ParsiDateTime (Date and Time) ---
 //! let pdt = ParsiDateTime::new(1403, 5, 2, 15, 30, 45).unwrap();
 //! assert_eq!(pdt.year(), 1403);
 //! assert_eq!(pdt.hour(), 15);
@@ -110,11 +164,11 @@
 //!     assert_eq!(london_dt.minute(), 30);
 //! }
 //!
-//! // --- Serde (requires 'serde' feature) ---
+//! // --- Serde Integration (requires `serde` feature) ---
 //! #[cfg(feature = "serde")]
 //! {
 //!     use serde_json;
-//!     // ParsiDate example (unchanged)
+//!     // ParsiDate example
 //!     let pd_serde = ParsiDate::new(1403, 1, 1).unwrap();
 //!     let json_pd = serde_json::to_string(&pd_serde).unwrap();
 //!     println!("Serialized ParsiDate: {}", json_pd); // {"year":1403,"month":1,"day":1}
@@ -140,31 +194,42 @@
 //!
 //! ## Features
 //!
-//! *   `serde`: Enables serialization and deserialization support via the `serde` crate.
-//! *   `timezone`: Enables timezone-aware functionality via `ZonedParsiDateTime` and the `chrono-tz` crate.
+//! This crate has two optional features:
+//!
+//! -   `serde`: Enables serialization and deserialization for `ParsiDate`, `ParsiDateTime`, and `Season`
+//!     via the `serde` crate. Add to `Cargo.toml` with `features = ["serde"]`.
+//! -   `timezone`: Enables the [`ZonedParsiDateTime`] struct for timezone-aware operations,
+//!     powered by the `chrono-tz` crate. Add to `Cargo.toml` with `features = ["timezone"]`.
+//!
+//! You can enable both with `features = ["serde", "timezone"]`.
 
-// Declare the modules within the src directory
+// --- Library Module Declarations ---
+// These `mod` statements declare the modules that form the library's internal structure.
+
 mod constants;
 mod date;
 mod datetime;
 mod error;
 mod season;
 
-// Conditionally declare the new 'zoned' module.
+// Conditionally compile and declare the `zoned` module only when the `timezone` feature is enabled.
 #[cfg(feature = "timezone")]
 mod zoned;
 
-// Conditionally declare the tests module
+// Conditionally compile the tests module, ensuring it's only included during `cargo test`.
 #[cfg(test)]
 mod tests;
 
-// Re-export the public API elements for easy access from the crate root
+// --- Public API Re-exports ---
+// Re-export the core public types to make them accessible directly from the crate root
+// (e.g., `use parsidate::ParsiDate;` instead of `use parsidate::date::ParsiDate;`).
+
 pub use constants::{MAX_PARSI_DATE, MIN_PARSI_DATE};
 pub use date::ParsiDate;
 pub use datetime::ParsiDateTime;
 pub use error::{DateError, ParseErrorKind};
 pub use season::Season;
 
-// Conditionally re-export the new 'ZonedParsiDateTime' struct.
+// Conditionally re-export the `ZonedParsiDateTime` struct if the `timezone` feature is active.
 #[cfg(feature = "timezone")]
 pub use zoned::ZonedParsiDateTime;
